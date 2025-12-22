@@ -1,6 +1,7 @@
 import streamlit as st
 import json
 import google.generativeai as genai
+from openai import OpenAI  # ✨ جدید: برای GapGPT
 from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.enum.text import PP_ALIGN
@@ -46,6 +47,44 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+# ✨ سایدبار با انتخاب AI Provider
+with st.sidebar:
+    st.title("⚙️ تنظیمات AI")
+    
+    ai_provider = st.selectbox(
+        "🤖 انتخاب هوش مصنوعی:",
+        ["GapGPT (توصیه می‌شود)", "Google Gemini"],
+        help="GapGPT: GPT-5, Claude 4.5 | Gemini: رایگان"
+    )
+    
+    if ai_provider == "GapGPT (توصیه می‌شود)":
+        gapgpt_model = st.selectbox(
+            "📦 مدل:",
+            ["gpt-5", "claude-sonnet-4-5", "gemini-2.5-pro", "gpt-4o", "deepseek"],
+            help="Claude 4.5 برای کدنویسی، GPT-5 برای خلاقیت"
+        )
+        
+        api_key_gapgpt = st.text_input("🔑 API Key گپ‌جی‌پی‌تی:", type="password")
+        
+        if api_key_gapgpt:
+            st.success(f"✅ {gapgpt_model} آماده!")
+        else:
+            st.warning("⚠️ API Key گپ‌جی‌پی‌تی نیاز است")
+    
+    else:
+        api_key_gapgpt = None
+        st.info("🔄 از Gemini استفاده می‌شود (با Fallback)")
+    
+    st.divider()
+    st.info("""
+**GapGPT چیه؟**
+پلتفرم ایرانی با:
+• GPT-5 (جدیدترین)
+• Claude 4.5 (بهترین)
+• Gemini Pro
+• بدون تحریم 🇮🇷
+    """)
+
 # توابع کمکی
 def calculate_content_length(duration_minutes):
     words_per_minute = 130
@@ -60,17 +99,17 @@ def calculate_content_length(duration_minutes):
         "total_words": total_words
     }
 
-def generate_speech_with_fallback(topic, duration_minutes, style, audience, resistance_level):
-    """تولید سخنرانی با Fallback Strategy"""
+# ✨ تابع جدید: تولید با GapGPT
+def generate_speech_with_gapgpt(topic, duration_minutes, style, audience, resistance_level, api_key, model):
+    """تولید سخنرانی با GapGPT API"""
     
-    api_key = os.environ.get("GEMINI_API_KEY", "")
     if not api_key:
-        st.error("❌ کلید API یافت نشد! لطفاً در تنظیمات Streamlit Cloud وارد کنید.")
+        st.error("❌ کلید API گپ‌جی‌پی‌تی یافت نشد!")
         return None
     
     content_length = calculate_content_length(duration_minutes)
     
-    # تعیین تعداد بخش‌ها بر اساس مدت زمان (AI خودکار)
+    # تعیین تعداد نکات
     if duration_minutes <= 10:
         num_points = 3
     elif duration_minutes <= 20:
@@ -80,7 +119,85 @@ def generate_speech_with_fallback(topic, duration_minutes, style, audience, resi
     else:
         num_points = 10
     
-    # راهنمای میزان مقاومت
+    resistance_guide = {
+        "کم": "مخاطب آماده است. لحن ملایم.",
+        "متوسط": "نیاز به دلیل و منطق.",
+        "زیاد": "مقاومت شدید. داستان‌های قوی و دلایل محکم."
+    }
+    
+    prompt = f"""یک سخنرانی منبری حرفه‌ای درباره "{topic}" تولید کن.
+
+**مشخصات:**
+- مدت: {duration_minutes} دقیقه (~{content_length['total_words']} کلمه)
+- سبک: {style}
+- مخاطب: {audience}
+- مقاومت: {resistance_level} → {resistance_guide[resistance_level]}
+- تعداد نکات: {num_points}
+
+**فرمت JSON دقیق:**
+{{
+    "title": "عنوان جذاب",
+    "introduction": "مقدمه الهام‌بخش ({content_length['intro_words']} کلمه)",
+    "points": [
+        {{
+            "number": 1,
+            "title": "عنوان نکته",
+            "content": "توضیح کامل ({content_length['points_words'] // num_points} کلمه)",
+            "example": "مثال واقعی",
+            "keywords": ["کلمه1", "کلمه2", "کلمه3"]
+        }}
+    ],
+    "conclusion": "جمع‌بندی ({content_length['conclusion_words']} کلمه)",
+    "key_messages": ["پیام1", "پیام2", "پیام3"]
+}}"""
+
+    try:
+        client = OpenAI(
+            base_url='https://api.gapgpt.app/v1',
+            api_key=api_key
+        )
+        
+        st.info(f"🔄 در حال تولید با {model}...")
+        
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": "تو متخصص سخنرانی منبری هستی. فقط JSON تولید می‌کنی."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7,
+            response_format={"type": "json_object"} if model.startswith("gpt") else None
+        )
+        
+        content = response.choices[0].message.content
+        result = json.loads(content)
+        st.success(f"✅ محتوا با {model} تولید شد!")
+        return result
+        
+    except Exception as e:
+        st.error(f"❌ خطا در {model}: {str(e)}")
+        return None
+
+# ✅ تابع قبلی: تولید با Gemini (حفظ شد)
+def generate_speech_with_fallback(topic, duration_minutes, style, audience, resistance_level):
+    """تولید سخنرانی با Gemini Fallback Strategy"""
+    
+    api_key = os.environ.get("GEMINI_API_KEY", "")
+    if not api_key:
+        st.error("❌ کلید API Gemini یافت نشد!")
+        return None
+    
+    content_length = calculate_content_length(duration_minutes)
+    
+    if duration_minutes <= 10:
+        num_points = 3
+    elif duration_minutes <= 20:
+        num_points = 5
+    elif duration_minutes <= 30:
+        num_points = 7
+    else:
+        num_points = 10
+    
     resistance_guide = {
         "کم": "مخاطب آماده پذیرش است. از لحن ملایم و تشویقی استفاده کن.",
         "متوسط": "مخاطب نیاز به دلیل و منطق دارد. از دلایل عقلی و قرآنی استفاده کن.",
@@ -119,7 +236,6 @@ def generate_speech_with_fallback(topic, duration_minutes, style, audience, resi
 تعداد نکات: {num_points}
 """
     
-    # Fallback Strategy
     models_to_try = [
         ("gemini-2.0-flash-exp", "Gemini 2.0 Flash (رایگان)"),
         ("gemini-1.5-flash", "Gemini 1.5 Flash (رایگان)"),
@@ -129,7 +245,7 @@ def generate_speech_with_fallback(topic, duration_minutes, style, audience, resi
     for model_name, model_label in models_to_try:
         try:
             st.info(f"🔄 در حال استفاده از {model_label}...")
-            time.sleep(2)  # Rate Limiting
+            time.sleep(2)
             
             genai.configure(api_key=api_key)
             model = genai.GenerativeModel(
@@ -154,7 +270,7 @@ def generate_speech_with_fallback(topic, duration_minutes, style, audience, resi
                 st.error(f"❌ خطا در {model_label}: {error_msg}")
                 continue
     
-    st.error("❌ تمام مدل‌های Gemini در دسترس نیستند. لطفاً بعداً امتحان کنید.")
+    st.error("❌ تمام مدل‌های Gemini در دسترس نیستند.")
     return None
 
 def create_powerpoint(speech_data, duration_minutes):
@@ -163,7 +279,6 @@ def create_powerpoint(speech_data, duration_minutes):
     prs.slide_width = Inches(10)
     prs.slide_height = Inches(7.5)
 
-    # اسلاید عنوان
     title_slide = prs.slides.add_slide(prs.slide_layouts[6])
     background = title_slide.shapes.add_shape(1, 0, 0, prs.slide_width, prs.slide_height)
     background.fill.solid()
@@ -184,12 +299,10 @@ def create_powerpoint(speech_data, duration_minutes):
     time_frame.paragraphs[0].font.color.rgb = (255, 255, 255)
     time_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
 
-    # مقدمه
     intro_slide = prs.slides.add_slide(prs.slide_layouts[1])
     intro_slide.shapes.title.text = "مقدمه"
     intro_slide.placeholders[1].text = speech_data['introduction']
 
-    # نکات
     for point in speech_data['points']:
         slide = prs.slides.add_slide(prs.slide_layouts[1])
         slide.shapes.title.text = f"{point['number']}. {point['title']}"
@@ -202,7 +315,6 @@ def create_powerpoint(speech_data, duration_minutes):
         p2.text = f"💡 {point['example']}"
         p2.level = 1
 
-    # جمع‌بندی
     conclusion_slide = prs.slides.add_slide(prs.slide_layouts[1])
     conclusion_slide.shapes.title.text = "جمع‌بندی"
     conclusion_slide.placeholders[1].text = speech_data['conclusion']
@@ -435,7 +547,14 @@ if st.button("🚀 تولید سخنرانی", type="primary", use_container_wid
         st.warning("⚠️ لطفاً موضوع را وارد کنید")
     else:
         with st.spinner("⏳ در حال تولید محتوا..."):
-            speech_data = generate_speech_with_fallback(topic, duration, style, audience, resistance)
+            # ✨ انتخاب AI بر اساس تنظیمات
+            if ai_provider == "GapGPT (توصیه می‌شود)" and api_key_gapgpt:
+                speech_data = generate_speech_with_gapgpt(
+                    topic, duration, style, audience, resistance,
+                    api_key_gapgpt, gapgpt_model
+                )
+            else:
+                speech_data = generate_speech_with_fallback(topic, duration, style, audience, resistance)
             
             if speech_data:
                 # پیش‌نمایش
@@ -461,14 +580,12 @@ if st.button("🚀 تولید سخنرانی", type="primary", use_container_wid
                 cols = st.columns(4)
                 col_idx = 0
                 
-                # متن خام
                 if out_txt:
                     txt_file = create_raw_text(speech_data, duration)
                     with cols[col_idx % 4]:
                         st.download_button("📝 متن خام", txt_file, f"{topic[:15]}.txt", use_container_width=True)
                     col_idx += 1
                 
-                # PowerPoint
                 if out_pptx:
                     with st.spinner("📊 ساخت PowerPoint..."):
                         pptx_file = create_powerpoint(speech_data, duration)
@@ -476,7 +593,6 @@ if st.button("🚀 تولید سخنرانی", type="primary", use_container_wid
                             st.download_button("📊 PowerPoint", pptx_file, f"{topic[:15]}.pptx", use_container_width=True)
                     col_idx += 1
                 
-                # PDF
                 if out_pdf:
                     with st.spinner("📄 ساخت PDF..."):
                         pdf_file = create_pdf(speech_data, duration)
@@ -484,7 +600,6 @@ if st.button("🚀 تولید سخنرانی", type="primary", use_container_wid
                             st.download_button("📄 PDF", pdf_file, f"{topic[:15]}.pdf", use_container_width=True)
                     col_idx += 1
                 
-                # نمودار
                 if out_chart:
                     with st.spinner("📈 ساخت نمودار..."):
                         chart_file = create_content_chart(speech_data, duration)
@@ -492,35 +607,13 @@ if st.button("🚀 تولید سخنرانی", type="primary", use_container_wid
                             st.download_button("📈 نمودار", chart_file, f"نمودار_{topic[:15]}.png", use_container_width=True)
                     col_idx += 1
                 
-                # چک‌لیست
                 if out_checklist:
                     checklist = create_checklist(speech_data)
                     with cols[col_idx % 4]:
                         st.download_button("✅ چک‌لیست", checklist, f"چک‌لیست_{topic[:15]}.txt", use_container_width=True)
                     col_idx += 1
                 
-                # صوت
                 if out_audio:
                     with st.spinner("🔊 ساخت نمونه صوتی..."):
                         audio_file = create_audio_with_emotion(speech_data, duration)
                         if audio_file:
-                            with cols[col_idx % 4]:
-                                st.download_button("🔊 نمونه صوتی", audio_file, f"صوت_{topic[:15]}.mp3", use_container_width=True)
-                    col_idx += 1
-                
-                # اینفوگرافیک
-                if out_infographic:
-                    with st.spinner("🎨 ساخت اینفوگرافیک..."):
-                        infographic = create_infographic(speech_data, duration)
-                        with cols[col_idx % 4]:
-                            st.download_button("🎨 اینفوگرافیک", infographic, f"اینفو_{topic[:15]}.png", use_container_width=True)
-                    col_idx += 1
-                
-                # JSON
-                if out_json:
-                    with cols[col_idx % 4]:
-                        st.download_button("💾 JSON", json.dumps(speech_data, ensure_ascii=False, indent=2),
-                                           f"data_{topic[:15]}.json", use_container_width=True)
-
-st.markdown("---")
-st.markdown("💡 **با Fallback Strategy:** اگر سهمیه Gemini تمام شد، به مدل بعدی می‌رود")
