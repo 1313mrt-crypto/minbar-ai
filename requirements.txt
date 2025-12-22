@@ -5,4 +5,4 @@ reportlab
 pillow
 matplotlib
 gtts
-openai==1.54.4
+openai
