@@ -1,7 +1,8 @@
-streamlit==1.39.0
-google-generativeai==0.8.3
-python-pptx==1.0.2
-reportlab==4.2.5
-Pillow==10.4.0
-matplotlib==3.9.2
-gtts==2.5.3
+streamlit
+google-generativeai
+python-pptx
+reportlab
+pillow
+matplotlib
+gtts
+openai==1.54.4
