@@ -614,4 +614,4 @@ with tab2:
         if submitted:
             if not topic:
                 st.error("❌ لطفاً موضوع را وارد کنید!")
-            elif st.session_state.user_plan == 'free' and st
+            elif st.session_state.user_plan == 'free' and st.session_state.speeches_count >= 20:
