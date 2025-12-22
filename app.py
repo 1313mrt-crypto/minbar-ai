@@ -1,3 +1,4 @@
+
 import streamlit as st
 import json
 import google.generativeai as genai
@@ -10,7 +11,6 @@ from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
 from reportlab.lib.enums import TA_RIGHT, TA_CENTER
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 from matplotlib.patches import FancyBboxPatch
 from PIL import Image, ImageDraw, ImageFont
 import io
@@ -34,17 +34,17 @@ st.markdown("""
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
-    
+
     /* استایل‌های اصلی */
     .main {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 0;
     }
-    
+
     .stApp {
         background: transparent;
     }
-    
+
     /* هدر سفارشی */
     .custom-header {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -54,20 +54,20 @@ st.markdown("""
         box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         margin-bottom: 2rem;
     }
-    
+
     .custom-header h1 {
         color: white;
         font-size: 2.5rem;
         margin: 0;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
     }
-    
+
     .custom-header p {
         color: rgba(255,255,255,0.9);
         font-size: 1.1rem;
         margin-top: 0.5rem;
     }
-    
+
     /* کارت‌های زیبا */
     .feature-card {
         background: white;
@@ -77,12 +77,12 @@ st.markdown("""
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         transition: transform 0.3s, box-shadow 0.3s;
     }
-    
+
     .feature-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
     }
-    
+
     /* دکمه‌های زیبا */
     .stButton > button {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -95,12 +95,12 @@ st.markdown("""
         transition: all 0.3s;
         box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
     }
-    
+
     .stButton > button:hover {
         transform: scale(1.05);
         box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
     }
-    
+
     /* کارت پلن */
     .plan-card {
         background: white;
@@ -111,24 +111,24 @@ st.markdown("""
         transition: all 0.3s;
         border: 3px solid transparent;
     }
-    
+
     .plan-card:hover {
         border-color: #667eea;
         transform: scale(1.05);
     }
-    
+
     .plan-card.premium {
         border-color: #f39c12;
         background: linear-gradient(135deg, #fff 0%, #ffeaa7 100%);
     }
-    
+
     .plan-price {
         font-size: 2.5rem;
         color: #667eea;
         font-weight: bold;
         margin: 1rem 0;
     }
-    
+
     /* نوار پیشرفت */
     .progress-bar {
         background: #f0f0f0;
@@ -137,7 +137,7 @@ st.markdown("""
         overflow: hidden;
         margin: 1rem 0;
     }
-    
+
     .progress-fill {
         background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
         height: 100%;
@@ -149,7 +149,7 @@ st.markdown("""
         color: white;
         font-weight: bold;
     }
-    
+
     /* Tooltips */
     .tooltip {
         background: #2c3e50;
@@ -159,13 +159,13 @@ st.markdown("""
         font-size: 0.9rem;
         margin-top: 0.5rem;
     }
-    
+
     /* Responsive */
     @media (max-width: 768px) {
         .custom-header h1 {
             font-size: 1.8rem;
         }
-        
+
         .plan-card {
             margin-bottom: 1rem;
         }
@@ -188,7 +188,7 @@ def calculate_content_length(duration_minutes):
     intro_words = int(total_words * 0.15)
     conclusion_words = int(total_words * 0.15)
     points_words = total_words - intro_words - conclusion_words
-    
+
     return {
         "intro_words": intro_words,
         "conclusion_words": conclusion_words,
@@ -200,9 +200,9 @@ def generate_speech(topic, num_points, duration_minutes, api_key):
     """تولید سخنرانی با AI"""
     if not api_key:
         return None
-    
+
     content_length = calculate_content_length(duration_minutes)
-    
+
     prompt = f"""
     یک سخنرانی منبری حرفه‌ای و جذاب درباره موضوع "{topic}" تولید کن.
 
@@ -233,7 +233,7 @@ def generate_speech(topic, num_points, duration_minutes, api_key):
     تعداد نکات: {num_points}
     سبک: رسمی، الهام‌بخش، با آیات/احادیث
     """
-    
+
     try:
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel(
@@ -243,13 +243,13 @@ def generate_speech(topic, num_points, duration_minutes, api_key):
                 "response_mime_type": "application/json"
             }
         )
-        
+
         # Rate Limiting
         time.sleep(2)  # تأخیر ۲ ثانیه
-        
+
         response = model.generate_content(prompt)
         return json.loads(response.text)
-    
+
     except Exception as e:
         st.error(f"❌ خطا: {str(e)}")
         return None
@@ -316,11 +316,11 @@ def create_pdf(speech_data, duration_minutes):
     story = []
     styles = getSampleStyleSheet()
 
-    title_style = ParagraphStyle('CustomTitle', parent=styles['Heading1'], fontSize=24, 
+    title_style = ParagraphStyle('CustomTitle', parent=styles['Heading1'], fontSize=24,
                                   textColor='#2c3e50', spaceAfter=30, alignment=TA_CENTER)
-    heading_style = ParagraphStyle('CustomHeading', parent=styles['Heading2'], fontSize=16, 
+    heading_style = ParagraphStyle('CustomHeading', parent=styles['Heading2'], fontSize=16,
                                     textColor='#34495e', spaceAfter=12, alignment=TA_RIGHT)
-    normal_style = ParagraphStyle('CustomNormal', parent=styles['Normal'], fontSize=12, 
+    normal_style = ParagraphStyle('CustomNormal', parent=styles['Normal'], fontSize=12,
                                    leading=18, alignment=TA_RIGHT)
 
     story.append(Paragraph(speech_data['title'], title_style))
@@ -344,6 +344,69 @@ def create_pdf(speech_data, duration_minutes):
     pdf_io.seek(0)
     return pdf_io
 
+def create_content_chart(speech_data, duration_minutes):
+    """ساخت نمودار محتوا"""
+    fig, ax = plt.subplots(figsize=(12, 8), facecolor='white')
+
+    segments = ['مقدمه'] + [f"نکته {i+1}" for i in range(len(speech_data['points']))] + ['جمع‌بندی']
+    colors = ['#3498db', '#e74c3c', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c', '#34495e']
+
+    y_positions = list(range(len(segments)))
+
+    for i, (segment, color) in enumerate(zip(segments, colors)):
+        rect = FancyBboxPatch((0, i-0.4), 10, 0.8, boxstyle="round,pad=0.1",
+                               facecolor=color, edgecolor='none', alpha=0.7)
+        ax.add_patch(rect)
+        ax.text(5, i, segment, ha='center', va='center', fontsize=14,
+                color='white', weight='bold', family='sans-serif')
+
+    ax.set_xlim(-1, 11)
+    ax.set_ylim(-1, len(segments))
+    ax.axis('off')
+    ax.set_title(f'ساختار سخنرانی - {duration_minutes} دقیقه',
+                 fontsize=18, weight='bold', pad=20, family='sans-serif')
+
+    plt.tight_layout()
+
+    chart_io = io.BytesIO()
+    plt.savefig(chart_io, format='png', dpi=300, bbox_inches='tight')
+    chart_io.seek(0)
+    plt.close()
+
+    return chart_io
+
+def create_infographic(speech_data, duration_minutes):
+    """ساخت اینفوگرافیک"""
+    width, height = 1200, 1600
+    img = Image.new('RGB', (width, height), color='#f8f9fa')
+    draw = ImageDraw.Draw(img)
+
+    # رنگ‌ها
+    primary_color = (102, 126, 234)
+    secondary_color = (118, 75, 162)
+
+    # عنوان
+    header_height = 150
+    draw.rectangle([(0, 0), (width, header_height)], fill=primary_color)
+
+    # نکات
+    y_offset = 200
+    for i, point in enumerate(speech_data['points'], 1):
+        box_y = y_offset + (i-1) * 250
+        draw.rounded_rectangle(
+            [(50, box_y), (width-50, box_y+200)],
+            radius=20,
+            fill='white',
+            outline=secondary_color,
+            width=3
+        )
+
+    img_io = io.BytesIO()
+    img.save(img_io, format='PNG', quality=95)
+    img_io.seek(0)
+
+    return img_io
+
 # ==================== UI اصلی ====================
 
 # هدر سفارشی
@@ -360,29 +423,33 @@ tab1, tab2, tab3, tab4 = st.tabs(["🏠 خانه", "✨ تولید سخنران�
 # ==================== تب خانه ====================
 with tab1:
     st.markdown('<div class="feature-card">', unsafe_allow_html=True)
-    
+
     col1, col2 = st.columns([2, 1])
-    
+
     with col1:
         st.markdown("### 🚀 قابلیت‌های منبر هوشمند")
         st.markdown("""
-        - ✅ **تولید سخنرانی** در چند ثانیه
-        - ✅ **Fact-Checking** با ۳۷ منبع معتبر
-        - ✅ **خروجی‌های متنوع**: PowerPoint, PDF, صوت، ...
-        - ✅ **همکاری تیمی** روی پروژه‌ها
-        - ✅ **آفلاین** هم کار می‌کند!
-        - ✅ **موبایل-محور** و سریع
+        - ✅ تولید سخنرانی در چند ثانیه
+        - ✅ Fact-Checking با ۳۷ منبع معتبر
+        - ✅ خروجی‌های متنوع: PowerPoint, PDF, صوت
+        - ✅ همکاری تیمی روی پروژه‌ها
+        - ✅ آفلاین هم کار می‌کند
+        - ✅ موبایل-محور و سریع
         """)
-    
+
     with col2:
-        st.image("https://via.placeholder.com/300x200?text=Demo", use_container_width=True)
-    
+        # ✅ اصلاح شده: use_column_width
+        try:
+            st.image("https://via.placeholder.com/300x200?text=Demo", use_column_width=True)
+        except:
+            st.info("🖼️ تصویر Demo")
+
     st.markdown('</div>', unsafe_allow_html=True)
-    
+
     # آمار
     st.markdown("---")
     col1, col2, col3 = st.columns(3)
-    
+
     with col1:
         st.metric("👥 کاربران فعال", "۱,۲۳۴")
     with col2:
@@ -396,7 +463,7 @@ with tab2:
     if st.session_state.user_plan == 'free':
         remaining = 20 - st.session_state.speeches_count
         progress = (st.session_state.speeches_count / 20) * 100
-        
+
         st.markdown(f"""
         <div class="progress-bar">
             <div class="progress-fill" style="width: {progress}%;">
@@ -404,32 +471,32 @@ with tab2:
             </div>
         </div>
         """, unsafe_allow_html=True)
-        
+
         if remaining <= 5:
             st.warning(f"⚠️ فقط {remaining} سخنرانی باقی مانده! به پلن Premium ارتقا دهید.")
-    
+
     st.markdown("---")
-    
+
     # فرم ورودی
     with st.form("speech_form"):
         col1, col2 = st.columns([2, 1])
-        
+
         with col1:
             topic = st.text_input("📝 موضوع سخنرانی:", placeholder="مثال: اهمیت صبر در زندگی")
-        
+
         with col2:
             duration = st.selectbox("⏱️ مدت زمان:", [5, 10, 15, 20, 30, 45, 60])
-        
+
         num_points = st.slider("🔢 تعداد نکات:", 3, 10, 5)
-        
+
         # تخمین حجم
         est = calculate_content_length(duration)
         st.info(f"📊 تخمین: {est['total_words']} کلمه | {duration} دقیقه")
-        
+
         # انتخاب خروجی‌ها
         st.markdown("### 📦 خروجی‌های مورد نظر:")
         col1, col2, col3 = st.columns(3)
-        
+
         with col1:
             out_pptx = st.checkbox("📊 PowerPoint", value=True)
             out_pdf = st.checkbox("📄 PDF", value=True)
@@ -438,13 +505,13 @@ with tab2:
             out_chart = st.checkbox("📈 نمودار", value=True)
         with col3:
             out_infographic = st.checkbox("🎨 اینفوگرافیک", value=False)
-        
+
         # API Key
-        api_key = st.text_input("🔑 کلید API (Gemini):", type="password", 
+        api_key = st.text_input("🔑 کلید API (Gemini):", type="password",
                                  value=os.environ.get("GEMINI_API_KEY", ""))
-        
-        submitted = st.form_submit_button("🚀 تولید سخنرانی", use_container_width=True)
-        
+
+        submitted = st.form_submit_button("🚀 تولید سخنرانی")
+
         if submitted:
             if not topic:
                 st.error("❌ لطفاً موضوع را وارد کنید!")
@@ -455,11 +522,11 @@ with tab2:
             else:
                 with st.spinner("⏳ در حال تولید..."):
                     speech_data = generate_speech(topic, num_points, duration, api_key)
-                    
+
                     if speech_data:
                         st.success("✅ سخنرانی تولید شد!")
                         st.session_state.speeches_count += 1
-                        
+
                         # پیش‌نمایش
                         with st.expander("👁️ پیش‌نمایش", expanded=True):
                             st.markdown(f"### {speech_data['title']}")
@@ -467,44 +534,76 @@ with tab2:
                             st.markdown("---")
                             st.markdown("#### 🎬 مقدمه")
                             st.write(speech_data['introduction'])
-                            
+
                             for point in speech_data['points']:
                                 st.markdown(f"#### {point['number']}. {point['title']}")
                                 st.write(point['content'])
                                 st.info(f"💡 {point['example']}")
-                            
+
                             st.markdown("#### 🎯 جمع‌بندی")
                             st.write(speech_data['conclusion'])
-                        
+
                         # دانلود
                         st.markdown("---")
                         st.markdown("### 📥 دانلود")
-                        
+
                         cols = st.columns(3)
                         idx = 0
-                        
+
                         if out_pptx:
-                            pptx = create_powerpoint(speech_data, duration)
-                            with cols[idx % 3]:
-                                st.download_button("📊 PowerPoint", pptx, 
-                                                   f"{topic[:15]}.pptx", 
-                                                   use_container_width=True)
-                            idx += 1
-                        
+                            with st.spinner("📊 ساخت PowerPoint..."):
+                                pptx = create_powerpoint(speech_data, duration)
+                                with cols[idx % 3]:
+                                    st.download_button(
+                                        "📊 PowerPoint",
+                                        pptx,
+                                        f"{topic[:15]}.pptx",
+                                        mime="application/vnd.openxmlformats-officedocument.presentationml.presentation"
+                                    )
+                                idx += 1
+
                         if out_pdf:
-                            pdf = create_pdf(speech_data, duration)
-                            with cols[idx % 3]:
-                                st.download_button("📄 PDF", pdf, 
-                                                   f"{topic[:15]}.pdf", 
-                                                   use_container_width=True)
-                            idx += 1
+                            with st.spinner("📄 ساخت PDF..."):
+                                pdf = create_pdf(speech_data, duration)
+                                with cols[idx % 3]:
+                                    st.download_button(
+                                        "📄 PDF",
+                                        pdf,
+                                        f"{topic[:15]}.pdf",
+                                        mime="application/pdf"
+                                    )
+                                idx += 1
+
+                        if out_chart:
+                            with st.spinner("📈 ساخت نمودار..."):
+                                chart = create_content_chart(speech_data, duration)
+                                with cols[idx % 3]:
+                                    st.download_button(
+                                        "📈 نمودار",
+                                        chart,
+                                        f"{topic[:15]}_chart.png",
+                                        mime="image/png"
+                                    )
+                                idx += 1
+
+                        if out_infographic:
+                            with st.spinner("🎨 ساخت اینفوگرافیک..."):
+                                infographic = create_infographic(speech_data, duration)
+                                with cols[idx % 3]:
+                                    st.download_button(
+                                        "🎨 اینفوگرافیک",
+                                        infographic,
+                                        f"{topic[:15]}_infographic.png",
+                                        mime="image/png"
+                                    )
+                                idx += 1
 
 # ==================== تب پلن‌ها ====================
 with tab3:
     st.markdown("### 💎 انتخاب پلن مناسب")
-    
+
     col1, col2, col3 = st.columns(3)
-    
+
     with col1:
         st.markdown("""
         <div class="plan-card">
@@ -516,11 +615,11 @@ with tab3:
             <p>❌ Fact-Checking</p>
         </div>
         """, unsafe_allow_html=True)
-        
-        if st.button("شروع رایگان", key="free", use_container_width=True):
+
+        if st.button("شروع رایگان", key="free"):
             st.session_state.user_plan = 'free'
             st.success("✅ پلن رایگان فعال شد!")
-    
+
     with col2:
         st.markdown("""
         <div class="plan-card premium">
@@ -533,10 +632,10 @@ with tab3:
             <p>✅ همکاری تیمی</p>
         </div>
         """, unsafe_allow_html=True)
-        
-        if st.button("خرید Premium", key="premium", use_container_width=True, type="primary"):
+
+        if st.button("خرید Premium", key="premium", type="primary"):
             st.info("🔜 به زودی: اتصال به زرین‌پال")
-    
+
     with col3:
         st.markdown("""
         <div class="plan-card">
@@ -549,26 +648,26 @@ with tab3:
             <p>✅ White-Label</p>
         </div>
         """, unsafe_allow_html=True)
-        
-        if st.button("تماس با ما", key="pro", use_container_width=True):
+
+        if st.button("تماس با ما", key="pro"):
             st.info("📧 support@minbar-ai.ir")
 
 # ==================== تب تنظیمات ====================
 with tab4:
     st.markdown("### ⚙️ تنظیمات")
-    
+
     with st.form("settings_form"):
         st.markdown("#### 🌐 زبان")
         language = st.selectbox("انتخاب زبان:", ["فارسی", "عربی", "English"])
-        
+
         st.markdown("#### 🔔 اعلان‌ها")
         notifications = st.checkbox("فعال‌سازی Push Notification", value=True)
-        
+
         st.markdown("#### 🎨 ظاهر")
         theme = st.selectbox("تم:", ["روشن", "تیره"])
-        
-        saved = st.form_submit_button("💾 ذخیره", use_container_width=True)
-        
+
+        saved = st.form_submit_button("💾 ذخیره")
+
         if saved:
             st.success("✅ تنظیمات ذخیره شد!")
 
