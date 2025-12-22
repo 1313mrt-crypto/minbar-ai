@@ -1,221 +1,204 @@
 import streamlit as st
 import json
-from openai import OpenAI
+import google.generativeai as genai
 from pptx import Presentation
-from pptx.util import Inches
+from pptx.util import Inches, Pt
+from pptx.enum.text import PP_ALIGN
 import io
+import os
 
-# ═══════════════════════════════════════════════════════════
-# تنظیمات اولیه
-# ═══════════════════════════════════════════════════════════
-st.set_page_config(
-    page_title="🎤 دستیار هوشمند منبر",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+# تنظیم صفحه
+st.set_page_config(page_title="منبر هوشمند", page_icon="🎤", layout="wide")
 
-# دریافت API Key از secrets یا input
-if "openai" in st.secrets:
-    default_api = st.secrets["openai"]["api_key"]
-else:
-    default_api = ""
-
-if "api_key" not in st.session_state:
-    st.session_state.api_key = default_api
-
-# ═══════════════════════════════════════════════════════════
 # سایدبار
-# ═══════════════════════════════════════════════════════════
 with st.sidebar:
-    st.title("🎛 تنظیمات منبر")
+    st.title("⚙️ تنظیمات")
     
+    # دریافت API Key
     api_key = st.text_input(
-        "🔑 کلید API OpenAI",
+        "🔑 کلید API جمینای:",
         type="password",
-        value=st.session_state.api_key,
-        help="اگر در Secrets تنظیم کردید، خودکار پر می‌شود"
+        value=os.environ.get("GEMINI_API_KEY", ""),
+        help="کلید API خود را از https://aistudio.google.com/app/apikey دریافت کنید"
     )
-    st.session_state.api_key = api_key
+    
+    if api_key:
+        genai.configure(api_key=api_key)
+        st.success("✅ API Key تنظیم شد!")
+    else:
+        st.warning("⚠️ لطفاً کلید API را وارد کنید")
     
     st.divider()
+    st.markdown("### 📌 راهنما")
+    st.markdown("""
+    1. موضوع سخنرانی را وارد کنید
+    2. تعداد نکات را انتخاب کنید
+    3. دکمه تولید را بزنید
+    4. PowerPoint را دانلود کنید
+    """)
+
+# تابع تولید سخنرانی
+def generate_speech(topic, num_points):
+    if not api_key:
+        st.error("❌ لطفاً کلید API را در سایدبار وارد کنید")
+        return None
     
-    topic = st.text_input("📚 موضوع سخنرانی", "حجاب و هویت")
-    audience = st.selectbox("👥 مخاطب", ["نوجوان (نسل Z)", "جوانان دانشجو", "عموم مردم", "بازاریان"])
-    tone = st.selectbox("🎭 لحن", ["حماسی و انگیزشی", "صمیمی و دوستانه", "منطقی و علمی", "احساسی و لطیف"])
-    resistance = st.select_slider("⚡ میزان مقاومت", options=["همراه (موافق)", "بی‌تفاوت", "مخالف (گارد گرفته)"])
+    prompt = f"""
+    یک سخنرانی منبری حرفه‌ای و جذاب درباره موضوع "{topic}" تولید کن.
     
-    st.divider()
-    generate_btn = st.button("🚀 تولید سخنرانی", type="primary", use_container_width=True)
-
-# ═══════════════════════════════════════════════════════════
-# توابع
-# ═══════════════════════════════════════════════════════════
-def create_prompt(topic, audience, tone, resistance):
-    return f"""
-Role: You are a Grand Ayatollah, Top Psychologist, and Master Orator.
-
-Create a structured speech in Persian based on:
-- Topic: {topic}
-- Audience: {audience}
-- Tone: {tone}
-- Resistance: {resistance}
-
-Output ONLY valid JSON with exactly 5 steps:
-{{
-  "meta": {{"perspective": "...", "core_metaphor": "..."}},
-  "critique_report": "...",
-  "speech_content": [
-    {{"step": "1. Motivation", "text": "...", "storyboard": "...", "slide_title": "...", "slide_bullet_points": ["..."]}},
-    {{"step": "2. Problem", "text": "...", "storyboard": "...", "slide_title": "...", "slide_bullet_points": ["..."]}},
-    {{"step": "3. Solution", "text": "...", "storyboard": "...", "slide_title": "...", "slide_bullet_points": ["..."]}},
-    {{"step": "4. Proof", "text": "...", "storyboard": "...", "slide_title": "...", "slide_bullet_points": ["..."]}},
-    {{"step": "5. Action", "text": "...", "storyboard": "...", "slide_title": "...", "slide_bullet_points": ["..."]}}
-  ],
-  "checklist": ["..."],
-  "infographic_code": "graph TD\\n A[Start]-->B[End]"
-}}
-"""
-
-def generate_speech(api_key, topic, audience, tone, resistance):
+    خروجی باید دقیقاً به این فرمت JSON باشد (بدون توضیح اضافی):
+    {{
+        "title": "عنوان سخنرانی",
+        "introduction": "مقدمه‌ای جذاب و گیرا (۳-۴ جمله)",
+        "points": [
+            {{
+                "number": 1,
+                "title": "عنوان نکته اول",
+                "content": "توضیح کامل نکته (۴-۵ جمله)",
+                "example": "مثال واقعی و کاربردی"
+            }}
+        ],
+        "conclusion": "جمع‌بندی قوی و الهام‌بخش"
+    }}
+    
+    تعداد نکات: {num_points}
+    سبک: رسمی، الهام‌بخش، با استفاده از آیات و احادیث
+    """
+    
     try:
-        client = OpenAI(api_key=api_key)
-        response = client.chat.completions.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": "You are a speech expert. Output only valid JSON."},
-                {"role": "user", "content": create_prompt(topic, audience, tone, resistance)}
-            ],
-            response_format={"type": "json_object"},
-            temperature=0.8
+        model = genai.GenerativeModel(
+            model_name="gemini-2.0-flash-exp",
+            generation_config={
+                "temperature": 0.7,
+                "response_mime_type": "application/json"
+            }
         )
-        return json.loads(response.choices[0].message.content)
+        
+        response = model.generate_content(prompt)
+        return json.loads(response.text)
+    
     except Exception as e:
-        st.error(f"❌ خطا در تولید: {str(e)}")
+        st.error(f"❌ خطا در تولید محتوا: {str(e)}")
         return None
 
-def create_powerpoint(data, topic):
+# تابع ساخت PowerPoint
+def create_powerpoint(speech_data):
     prs = Presentation()
+    prs.slide_width = Inches(10)
+    prs.slide_height = Inches(7.5)
     
     # اسلاید عنوان
-    title_slide = prs.slides.add_slide(prs.slide_layouts[0])
-    title_slide.shapes.title.text = topic
-    title_slide.placeholders[1].text = f"زاویه دید: {data['meta']['perspective']}"
+    title_slide = prs.slides.add_slide(prs.slide_layouts[6])
     
-    # اسلایدهای محتوا
-    for section in data["speech_content"]:
+    # پس‌زمینه عنوان
+    background = title_slide.shapes.add_shape(
+        1, 0, 0, prs.slide_width, prs.slide_height
+    )
+    background.fill.solid()
+    background.fill.fore_color.rgb = (41, 128, 185)
+    
+    # عنوان
+    title_box = title_slide.shapes.add_textbox(
+        Inches(1), Inches(3), Inches(8), Inches(1.5)
+    )
+    title_frame = title_box.text_frame
+    title_frame.text = speech_data['title']
+    title_frame.paragraphs[0].font.size = Pt(44)
+    title_frame.paragraphs[0].font.bold = True
+    title_frame.paragraphs[0].font.color.rgb = (255, 255, 255)
+    title_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
+    
+    # اسلاید مقدمه
+    intro_slide = prs.slides.add_slide(prs.slide_layouts[1])
+    intro_title = intro_slide.shapes.title
+    intro_title.text = "مقدمه"
+    intro_content = intro_slide.placeholders[1]
+    intro_content.text = speech_data['introduction']
+    
+    # اسلایدهای نکات
+    for point in speech_data['points']:
         slide = prs.slides.add_slide(prs.slide_layouts[1])
-        slide.shapes.title.text = section["slide_title"]
         
-        tf = slide.placeholders[1].text_frame
-        if section["slide_bullet_points"]:
-            tf.text = section["slide_bullet_points"][0]
-            for point in section["slide_bullet_points"][1:]:
-                p = tf.add_paragraph()
-                p.text = point
-                p.level = 0
-    
-    ppt_io = io.BytesIO()
-    prs.save(ppt_io)
-    ppt_io.seek(0)
-    return ppt_io
-
-# ═══════════════════════════════════════════════════════════
-# UI اصلی
-# ═══════════════════════════════════════════════════════════
-st.title("🎤 دستیار هوشمند منبر")
-st.markdown("### تولید سخنرانی ساختاریافته با هوش مصنوعی")
-
-if not st.session_state.api_key:
-    st.warning("⚠️ لطفاً کلید API OpenAI را در سایدبار وارد کنید")
-    st.info("💡 برای امنیت بیشتر، می‌توانید از قسمت Secrets در تنظیمات استریم‌لیت استفاده کنید")
-    st.stop()
-
-if generate_btn:
-    with st.spinner('🧠 در حال تولید سخنرانی...'):
-        data = generate_speech(st.session_state.api_key, topic, audience, tone, resistance)
-    
-    if data:
-        st.session_state.speech_data = data
-        st.success("✅ سخنرانی با موفقیت تولید شد!")
-        st.balloons()
-
-if "speech_data" in st.session_state:
-    data = st.session_state.speech_data
-    
-    # گزارش منتقد
-    with st.expander("🔍 گزارش تحلیل منتقد", expanded=False):
-        st.warning(data["critique_report"])
-    
-    # متادیتا
-    col1, col2 = st.columns(2)
-    with col1:
-        st.info(f"**🎯 زاویه دید:** {data['meta']['perspective']}")
-    with col2:
-        st.info(f"**🌟 استعاره اصلی:** {data['meta']['core_metaphor']}")
-    
-    st.divider()
-    
-    # متن سخنرانی
-    st.header("📜 متن کامل سخنرانی")
-    
-    for idx, section in enumerate(data["speech_content"], 1):
-        st.subheader(f"{section['step']}")
+        title = slide.shapes.title
+        title.text = f"{point['number']}. {point['title']}"
         
-        col1, col2 = st.columns([2, 1])
+        content = slide.placeholders[1]
+        text_frame = content.text_frame
+        text_frame.clear()
         
-        with col1:
-            st.markdown(section["text"])
+        p1 = text_frame.paragraphs[0]
+        p1.text = point['content']
+        p1.level = 0
         
-        with col2:
-            st.success("**🎬 استوری‌بورد:**")
-            st.caption(section["storyboard"])
-        
-        if idx < len(data["speech_content"]):
-            st.divider()
+        p2 = text_frame.add_paragraph()
+        p2.text = f"مثال: {point['example']}"
+        p2.level = 1
     
-    # چک‌لیست
-    st.header("✅ چک‌لیست نهایی")
-    for item in data["checklist"]:
-        st.checkbox(item, value=False)
+    # اسلاید جمع‌بندی
+    conclusion_slide = prs.slides.add_slide(prs.slide_layouts[1])
+    conclusion_title = conclusion_slide.shapes.title
+    conclusion_title.text = "جمع‌بندی"
+    conclusion_content = conclusion_slide.placeholders[1]
+    conclusion_content.text = speech_data['conclusion']
     
-    st.divider()
-    
-    # دانلود
-    st.header("📦 دانلود خروجی‌ها")
-    
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        json_data = json.dumps(data, ensure_ascii=False, indent=2)
-        st.download_button(
-            "📄 دانلود JSON",
-            json_data,
-            file_name=f"speech_{topic[:20]}.json",
-            mime="application/json",
-            use_container_width=True
-        )
-    
-    with col2:
-        ppt_file = create_powerpoint(data, topic)
-        st.download_button(
-            "📊 دانلود پاورپوینت",
-            ppt_file,
-            file_name=f"speech_{topic[:20]}.pptx",
-            mime="application/vnd.openxmlformats-officedocument.presentationml.presentation",
-            use_container_width=True
-        )
-    
-    with col3:
-        text_content = "\n\n".join([
-            f"{section['step']}\n{'='*50}\n{section['text']}" 
-            for section in data["speech_content"]
-        ])
-        st.download_button(
-            "📝 دانلود متن",
-            text_content,
-            file_name=f"speech_{topic[:20]}.txt",
-            mime="text/plain",
-            use_container_width=True
-        )
+    # ذخیره در حافظه
+    pptx_io = io.BytesIO()
+    prs.save(pptx_io)
+    pptx_io.seek(0)
+    return pptx_io
 
-st.caption("🤖 Powered by Claude Sonnet 4.5 & GPT-4o")
+# رابط کاربری اصلی
+st.title("🎤 منبر هوشمند - تولید سخنرانی با Gemini")
+st.markdown("---")
+
+col1, col2 = st.columns([2, 1])
+
+with col1:
+    topic = st.text_input(
+        "📝 موضوع سخنرانی:",
+        placeholder="مثلاً: اهمیت صبر در زندگی"
+    )
+
+with col2:
+    num_points = st.slider("🔢 تعداد نکات:", 3, 10, 5)
+
+if st.button("🚀 تولید سخنرانی", type="primary", use_container_width=True):
+    if not topic:
+        st.warning("⚠️ لطفاً موضوع سخنرانی را وارد کنید")
+    elif not api_key:
+        st.error("❌ لطفاً کلید API را در سایدبار وارد کنید")
+    else:
+        with st.spinner("⏳ در حال تولید محتوا..."):
+            speech_data = generate_speech(topic, num_points)
+            
+            if speech_data:
+                st.success("✅ سخنرانی با موفقیت تولید شد!")
+                
+                # نمایش نتیجه
+                with st.expander("👁️ پیش‌نمایش محتوا", expanded=True):
+                    st.markdown(f"### {speech_data['title']}")
+                    st.markdown("**مقدمه:**")
+                    st.write(speech_data['introduction'])
+                    
+                    for point in speech_data['points']:
+                        st.markdown(f"**{point['number']}. {point['title']}**")
+                        st.write(point['content'])
+                        st.info(f"💡 {point['example']}")
+                    
+                    st.markdown("**جمع‌بندی:**")
+                    st.write(speech_data['conclusion'])
+                
+                # دکمه دانلود
+                with st.spinner("📊 در حال ساخت PowerPoint..."):
+                    pptx_file = create_powerpoint(speech_data)
+                    
+                    st.download_button(
+                        label="📥 دانلود PowerPoint",
+                        data=pptx_file,
+                        file_name=f"سخنرانی_{topic[:20]}.pptx",
+                        mime="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                        type="primary"
+                    )
+
+st.markdown("---")
+st.markdown("💡 **نکته:** این ابزار با استفاده از Gemini 2.0 Flash ساخته شده است")
