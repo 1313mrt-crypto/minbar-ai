@@ -193,6 +193,28 @@ JSON فرمت:
     
     return None
 
+def create_text_file(speech_data, duration_minutes):
+    """ساخت فایل متنی TXT - خروجی جدید"""
+    text = f"{speech_data['title']}\n"
+    text += f"{'='*50}\n\n"
+    text += f"مدت زمان: {duration_minutes} دقیقه\n\n"
+    text += f"{'='*50}\n\n"
+    
+    text += "مقدمه:\n"
+    text += f"{speech_data['introduction']}\n\n"
+    text += f"{'='*50}\n\n"
+    
+    for point in speech_data['points']:
+        text += f"{point['number']}. {point['title']}\n"
+        text += f"{point['content']}\n\n"
+        text += f"مثال: {point['example']}\n\n"
+        text += f"{'='*50}\n\n"
+    
+    text += "جمع‌بندی:\n"
+    text += f"{speech_data['conclusion']}\n"
+    
+    return text
+
 def create_powerpoint(speech_data, duration_minutes):
     """ساخت PowerPoint"""
     prs = Presentation()
@@ -407,6 +429,7 @@ with st.sidebar:
     
     # خروجی‌ها
     st.markdown("### خروجی‌ها")
+    output_text = st.checkbox("متن TXT", value=True)  # ⭐ خروجی جدید - پیشفرض فعال
     output_pptx = st.checkbox("PowerPoint", value=True)
     output_pdf = st.checkbox("PDF", value=True)
     output_chart = st.checkbox("نمودار", value=True)
@@ -488,6 +511,19 @@ if st.button("تولید سخنرانی", type="primary", use_container_width=Tr
                 
                 cols = st.columns(3)
                 idx = 0
+                
+                # ⭐ خروجی متن TXT - اولین دکمه
+                if output_text:
+                    text_file = create_text_file(speech_data, duration)
+                    with cols[idx % 3]:
+                        st.download_button(
+                            "متن TXT",
+                            text_file,
+                            f"متن_{topic[:15]}.txt",
+                            "text/plain",
+                            use_container_width=True
+                        )
+                    idx += 1
                 
                 if output_pptx:
                     pptx = create_powerpoint(speech_data, duration)
