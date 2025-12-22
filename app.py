@@ -135,7 +135,7 @@ JSON فرمت:
         return json.loads(response.choices[0].message.content)
         
     except Exception as e:
-        st.error(f"❌ خطا در GapGPT: {str(e)}")
+        st.error(f"خطا در GapGPT: {str(e)}")
         return None
 
 def generate_speech_with_gemini(topic, num_points, duration_minutes, api_key):
@@ -188,7 +188,7 @@ JSON فرمت:
             return json.loads(response.text)
             
         except Exception as e:
-            st.warning(f"⚠️ {model_name} ناموفق: {str(e)}")
+            st.warning(f"{model_name} ناموفق: {str(e)}")
             continue
     
     return None
@@ -215,7 +215,7 @@ def create_powerpoint(speech_data, duration_minutes):
 
     time_box = title_slide.shapes.add_textbox(Inches(1), Inches(4.5), Inches(8), Inches(0.5))
     time_frame = time_box.text_frame
-    time_frame.text = f"⏱️ مدت: {duration_minutes} دقیقه"
+    time_frame.text = f"مدت: {duration_minutes} دقیقه"
     time_frame.paragraphs[0].font.size = Pt(24)
     time_frame.paragraphs[0].font.color.rgb = (255, 255, 255)
     time_frame.paragraphs[0].alignment = PP_ALIGN.CENTER
@@ -235,7 +235,7 @@ def create_powerpoint(speech_data, duration_minutes):
         p1 = text_frame.paragraphs[0]
         p1.text = point['content']
         p2 = text_frame.add_paragraph()
-        p2.text = f"💡 {point['example']}"
+        p2.text = f"مثال: {point['example']}"
         p2.level = 1
 
     # جمع‌بندی
@@ -263,7 +263,7 @@ def create_pdf(speech_data, duration_minutes):
                                    leading=18, alignment=TA_RIGHT)
 
     story.append(Paragraph(speech_data['title'], title_style))
-    story.append(Paragraph(f"⏱️ {duration_minutes} دقیقه", normal_style))
+    story.append(Paragraph(f"مدت: {duration_minutes} دقیقه", normal_style))
     story.append(Spacer(1, 0.5*inch))
     story.append(Paragraph("مقدمه", heading_style))
     story.append(Paragraph(speech_data['introduction'], normal_style))
@@ -272,7 +272,7 @@ def create_pdf(speech_data, duration_minutes):
     for point in speech_data['points']:
         story.append(Paragraph(f"{point['number']}. {point['title']}", heading_style))
         story.append(Paragraph(point['content'], normal_style))
-        story.append(Paragraph(f"💡 {point['example']}", normal_style))
+        story.append(Paragraph(f"مثال: {point['example']}", normal_style))
         story.append(Spacer(1, 0.2*inch))
 
     story.append(PageBreak())
@@ -311,20 +311,20 @@ def create_content_chart(speech_data, duration_minutes):
 
 def create_checklist(speech_data):
     """چک‌لیست"""
-    text = f"📋 چک‌لیست - {speech_data['title']}\n{'='*50}\n\n"
+    text = f"چک‌لیست - {speech_data['title']}\n\n"
     
     if 'key_messages' in speech_data:
-        text += "🎯 پیام‌های کلیدی:\n"
+        text += "پیام‌های کلیدی:\n"
         for i, msg in enumerate(speech_data['key_messages'], 1):
-            text += f"  ☐ {i}. {msg}\n"
+            text += f"{i}. {msg}\n"
     
-    text += f"\n{'='*50}\n📌 کلمات کلیدی:\n\n"
+    text += "\nکلمات کلیدی:\n\n"
     
     for point in speech_data['points']:
         text += f"{point['number']}. {point['title']}:\n"
         if 'keywords' in point:
             for kw in point['keywords']:
-                text += f"  ☐ {kw}\n"
+                text += f"  - {kw}\n"
         text += "\n"
     
     return text
@@ -345,7 +345,8 @@ def create_audio_guide(speech_data, duration_minutes):
         tts.write_to_fp(audio_io)
         audio_io.seek(0)
         return audio_io
-    except:
+    except Exception as e:
+        st.warning(f"خطا در ساخت صوت: {str(e)}")
         return None
 
 def create_infographic(speech_data, duration_minutes):
@@ -376,47 +377,47 @@ def create_infographic(speech_data, duration_minutes):
 
 # ==================== سایدبار ====================
 with st.sidebar:
-    st.title("⚙️ تنظیمات")
+    st.title("تنظیمات")
     
     # انتخاب AI
     ai_provider = st.selectbox(
-        "🤖 ارائه‌دهنده AI:",
+        "ارائه‌دهنده AI:",
         ["GapGPT (توصیه می‌شود)", "Google Gemini"]
     )
     
     # تنظیمات GapGPT
     if "GapGPT" in ai_provider:
         gapgpt_model = st.selectbox(
-            "📦 مدل GapGPT:",
+            "مدل GapGPT:",
             ["claude-sonnet-4-5", "gpt-4o", "gemini-2.5-pro", "grok-2"]
         )
-        gapgpt_key = st.text_input("🔑 کلید GapGPT:", type="password")
+        gapgpt_key = st.text_input("کلید GapGPT:", type="password")
         
         if gapgpt_key:
-            st.success("✅ GapGPT آماده است!")
+            st.success("GapGPT آماده است!")
     
     # تنظیمات Gemini
     else:
-        gemini_key = st.text_input("🔑 کلید Gemini:", type="password",
+        gemini_key = st.text_input("کلید Gemini:", type="password",
                                     value=os.environ.get("GEMINI_API_KEY", ""))
         if gemini_key:
-            st.success("✅ Gemini آماده است!")
+            st.success("Gemini آماده است!")
     
     st.divider()
     
     # خروجی‌ها
-    st.markdown("### 📦 خروجی‌ها")
-    output_pptx = st.checkbox("📊 PowerPoint", value=True)
-    output_pdf = st.checkbox("📄 PDF", value=True)
-    output_chart = st.checkbox("📈 نمودار", value=True)
-    output_checklist = st.checkbox("✅ چک‌لیست", value=True)
-    output_audio = st.checkbox("🔊 صوت", value=False)
-    output_infographic = st.checkbox("🎨 اینفوگرافیک", value=True)
+    st.markdown("### خروجی‌ها")
+    output_pptx = st.checkbox("PowerPoint", value=True)
+    output_pdf = st.checkbox("PDF", value=True)
+    output_chart = st.checkbox("نمودار", value=True)
+    output_checklist = st.checkbox("چک‌لیست", value=True)
+    output_audio = st.checkbox("صوت", value=False)
+    output_infographic = st.checkbox("اینفوگرافیک", value=True)
 
 # ==================== UI اصلی ====================
 st.markdown("""
 <div class="custom-header">
-    <h1>🎤 منبر هوشمند</h1>
+    <h1>منبر هوشمند</h1>
     <p>استودیوی کامل تولید سخنرانی</p>
 </div>
 """, unsafe_allow_html=True)
@@ -424,38 +425,39 @@ st.markdown("""
 col1, col2, col3 = st.columns([2, 1, 1])
 
 with col1:
-    topic = st.text_input("📝 موضوع:", placeholder="مثال: اهمیت صبر")
+    topic = st.text_input("موضوع:", placeholder="مثال: اهمیت صبر")
 
 with col2:
-    duration = st.selectbox("⏱️ مدت (دقیقه):", [5, 10, 15, 20, 30, 45, 60])
+    duration = st.selectbox("مدت (دقیقه):", [5, 10, 15, 20, 30, 45, 60])
 
 with col3:
-    num_points = st.slider("🔢 تعداد نکات:", 3, 10, 5)
+    num_points = st.slider("تعداد نکات:", 3, 10, 5)
 
 est = calculate_content_length(duration)
-st.info(f"📊 تخمین: {est['total_words']} کلمه")
+st.info(f"تخمین: {est['total_words']} کلمه")
 
-if st.button("🚀 تولید سخنرانی", type="primary", use_container_width=True):
+if st.button("تولید سخنرانی", type="primary", use_container_width=True):
     if not topic:
-        st.error("❌ موضوع را وارد کنید!")
+        st.error("موضوع را وارد کنید!")
     elif "GapGPT" in ai_provider and not gapgpt_key:
-        st.error("❌ کلید GapGPT را وارد کنید!")
+        st.error("کلید GapGPT را وارد کنید!")
     elif "Gemini" in ai_provider and not gemini_key:
-        st.error("❌ کلید Gemini را وارد کنید!")
+        st.error("کلید Gemini را وارد کنید!")
     else:
-        with st.spinner("⏳ در حال تولید..."):
+        with st.spinner("در حال تولید..."):
             speech_data = None
             
             # تولید با GapGPT
             if "GapGPT" in ai_provider:
-                st.info(f"🔄 در حال تولید با {gapgpt_model}...")
+                st.info(f"در حال تولید با {gapgpt_model}...")
                 speech_data = generate_speech_with_gapgpt(topic, num_points, duration, gapgpt_key, gapgpt_model)
                 
                 if speech_data:
-                    st.success(f"✅ محتوا با {gapgpt_model} تولید شد!")
+                    st.success(f"محتوا با {gapgpt_model} تولید شد!")
                 else:
-                    st.warning("⚠️ GapGPT ناموفق، تلاش با Gemini...")
-                    speech_data = generate_speech_with_gemini(topic, num_points, duration, gemini_key)
+                    st.warning("GapGPT ناموفق، تلاش با Gemini...")
+                    if 'gemini_key' in locals():
+                        speech_data = generate_speech_with_gemini(topic, num_points, duration, gemini_key)
             
             # تولید با Gemini
             else:
@@ -465,24 +467,24 @@ if st.button("🚀 تولید سخنرانی", type="primary", use_container_wid
                 st.session_state.speeches_count += 1
                 
                 # پیش‌نمایش
-                with st.expander("👁️ پیش‌نمایش", expanded=True):
+                with st.expander("پیش‌نمایش", expanded=True):
                     st.markdown(f"### {speech_data['title']}")
-                    st.markdown(f"**⏱️ {duration} دقیقه**")
+                    st.markdown(f"**مدت: {duration} دقیقه**")
                     st.markdown("---")
-                    st.markdown("#### 🎬 مقدمه")
+                    st.markdown("#### مقدمه")
                     st.write(speech_data['introduction'])
                     
                     for point in speech_data['points']:
                         st.markdown(f"#### {point['number']}. {point['title']}")
                         st.write(point['content'])
-                        st.info(f"💡 {point['example']}")
+                        st.info(f"مثال: {point['example']}")
                     
-                    st.markdown("#### 🎯 جمع‌بندی")
+                    st.markdown("#### جمع‌بندی")
                     st.write(speech_data['conclusion'])
                 
                 # دانلود
                 st.markdown("---")
-                st.markdown("### 📥 دانلود")
+                st.markdown("### دانلود")
                 
                 cols = st.columns(3)
                 idx = 0
@@ -490,44 +492,77 @@ if st.button("🚀 تولید سخنرانی", type="primary", use_container_wid
                 if output_pptx:
                     pptx = create_powerpoint(speech_data, duration)
                     with cols[idx % 3]:
-                        st.download_button("📊 PowerPoint", pptx, f"{topic[:15]}.pptx",
-                                          "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                                          use_container_width=True)
+                        st.download_button(
+                            "PowerPoint",
+                            pptx,
+                            f"{topic[:15]}.pptx",
+                            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                            use_container_width=True
+                        )
                     idx += 1
                 
                 if output_pdf:
                     pdf = create_pdf(speech_data, duration)
                     with cols[idx % 3]:
-                        st.download_button("📄 PDF", pdf, f"{topic[:15]}.pdf",
-                                          "application/pdf", use_container_width=True)
+                        st.download_button(
+                            "PDF",
+                            pdf,
+                            f"{topic[:15]}.pdf",
+                            "application/pdf",
+                            use_container_width=True
+                        )
                     idx += 1
                 
                 if output_chart:
                     chart = create_content_chart(speech_data, duration)
                     with cols[idx % 3]:
-                        st.download_button("📈 نمودار", chart, f"نمودار_{topic[:15]}.png",
-                                          "image/png", use_container_width=True)
+                        st.download_button(
+                            "نمودار",
+                            chart,
+                            f"نمودار_{topic[:15]}.png",
+                            "image/png",
+                            use_container_width=True
+                        )
                     idx += 1
                 
                 if output_checklist:
                     checklist = create_checklist(speech_data)
                     with cols[idx % 3]:
-                        st.download_button("✅ چک‌لیست", checklist, f"چک‌لیست_{topic[:15]}.txt",
-                                          "text/plain", use_container_width=True)
+                        st.download_button(
+                            "چک‌لیست",
+                            checklist,
+                            f"چک‌لیست_{topic[:15]}.txt",
+                            "text/plain",
+                            use_container_width=True
+                        )
                     idx += 1
                 
                 if output_audio:
-                    with st.spinner("🔊 ساخت صوت..."):
-                        audio = create_a
+                    with st.spinner("ساخت صوت..."):
+                        audio = create_audio_guide(speech_data, duration)
                         if audio:
                             with cols[idx % 3]:
-                                st.download_button("🔊 صوت", audio, f"صوت_{topic[:15]}.mp3",
-                                                 "audio/mp3", use_container_width=True)
+                                st.download_button(
+                                    "صوت",
+                                    audio,
+                                    f"صوت_{topic[:15]}.mp3",
+                                    "audio/mp3",
+                                    use_container_width=True
+                                )
                             idx += 1
-                        else:
-                            st.warning("⚠️ صوت ساخته نشد")
                 
                 if output_infographic:
                     infographic = create_infographic(speech_data, duration)
                     with cols[idx % 3]:
-                        st.download_button("🎨 اینف
+                        st.download_button(
+                            "اینفوگرافیک",
+                            infographic,
+                            f"اینفوگرافیک_{topic[:15]}.png",
+                            "image/png",
+                            use_container_width=True
+                        )
+            else:
+                st.error("تولید ناموفق بود!")
+
+st.markdown("---")
+st.markdown(f"ساخته شده با GapGPT & Gemini | استفاده: {st.session_state.speeches_count}")
