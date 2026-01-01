@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary Colors - Spiritual Blue -->
+    <color name="primary">#1A5490</color>
+    <color name="primary_light">#4A7BB7</color>
+    <color name="primary_dark">#0D3C6E</color>
+    
+    <!-- Secondary Colors - Golden -->
+    <color name="secondary">#D4AF37</color>
+    <color name="secondary_light">#E8C96F</color>
+    <color name="secondary_dark">#A88A2A</color>
+    
+    <!-- Background -->
+    <color name="background">#FAFAFA</color>
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#F5F5F5</color>
+    
+    <!-- Text Colors -->
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="text_hint">#BDBDBD</color>
+    
+    <!-- Status Colors -->
+    <color name="success">#4CAF50</color>
+    <color name="error">#F44336</color>
+    <color name="warning">#FF9800</color>
+    <color name="info">#2196F3</color>
+    
+    <!-- Moharram Theme -->
+    <color name="moharram_primary">#1C1C1C</color>
+    <color name="moharram_accent">#C62828</color>
+    
+    <!-- Ramadan Theme -->
+    <color name="ramadan_primary">#00695C</color>
+    <color name="ramadan_accent">#FFD54F</color>
+    
+    <!-- Eid Theme -->
+    <color name="eid_primary">#388E3C</color>
+    <color name="eid_accent">#FFF9C4</color>
+    
+    <!-- Neutral -->
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
+</resources>
