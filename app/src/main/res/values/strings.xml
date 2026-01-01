@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- App Name -->
+    <string name="app_name">سخنرانی هوشمند</string>
+    
+    <!-- Main Screens -->
+    <string name="home">خانه</string>
+    <string name="create">ایجاد سخنرانی</string>
+    <string name="library">کتابخانه</string>
+    <string name="projects">پروژه‌های من</string>
+    <string name="settings">تنظیمات</string>
+    
+    <!-- Stages -->
+    <string name="stage_motivation">مرحله ۱: انگیزه‌سازی</string>
+    <string name="stage_conviction">مرحله ۲: اقناع اندیشه</string>
+    <string name="stage_emotion">مرحله ۳: پرورش احساس</string>
+    <string name="stage_action">مرحله ۴: رفتارسازی</string>
+    <string name="stage_rawzeh">مرحله ۵: روضه</string>
+    
+    <!-- Actions -->
+    <string name="create_new">ایجاد جدید</string>
+    <string name="save">ذخیره</string>
+    <string name="cancel">انصراف</string>
+    <string name="delete">حذف</string>
+    <string name="edit">ویرایش</string>
+    <string name="share">اشتراک‌گذاری</string>
+    <string name="export">خروجی</string>
+    <string name="play">پخش</string>
+    <string name="pause">توقف</string>
+    <string name="download">دانلود</string>
+    
+    <!-- File Types -->
+    <string name="pdf_file">فایل PDF</string>
+    <string name="docx_file">فایل Word</string>
+    <string name="txt_file">فایل متنی</string>
+    <string name="web_url">آدرس وب</string>
+    
+    <!-- Export Formats -->
+    <string name="export_pdf">خروجی PDF</string>
+    <string name="export_pptx">خروجی PowerPoint</string>
+    <string name="export_infographic">خروجی اینفوگرافی</string>
+    <string name="export_audio">خروجی صوتی</string>
+    <string name="export_checklist">چک‌لیست تمرین</string>
+    
+    <!-- Messages -->
+    <string name="loading">در حال بارگذاری…</string>
+    <string name="generating">در حال تولید…</string>
+    <string name="success">موفقیت‌آمیز!</string>
+    <string name="error">خطا رخ داد</string>
+    <string name="no_internet">اتصال اینترنت وجود ندارد</string>
+    <string name="file_saved">فایل ذخیره شد</string>
+    
+    <!-- Permissions -->
+    <string name="permission_storage">دسترسی به حافظه</string>
+    <string name="permission_audio">دسترسی به میکروفون</string>
+    <string name="permission_notification">دسترسی به اعلان‌ها</string>
+    
+    <!-- Errors -->
+    <string name="error_file_too_large">حجم فایل بیش از حد مجاز است</string>
+    <string name="error_invalid_source">منبع نامعتبر است</string>
+    <string name="error_generation_failed">تولید سخنرانی ناموفق بود</string>
+    <string name="error_network">خطای شبکه</string>
+    
+    <!-- Empty States -->
+    <string name="empty_projects">هنوز پروژه‌ای ندارید</string>
+    <string name="empty_library">کتابخانه خالی است</string>
+    
+    <!-- Offline Mode -->
+    <string name="offline_mode">حالت آفلاین</string>
+    <string name="offline_model_download">دانلود مدل آفلاین</string>
+    <string name="offline_enabled">حالت آفلاین فعال است</string>
+    
+    <!-- Features -->
+    <string name="emotion_analysis">تحلیل عاطفی</string>
+    <string name="ai_coach">مربی هوشمند</string>
+    <string name="live_mode">حالت زنده</string>
+    <string name="training_mode">حالت آموزش</string>
+    
+    <!-- Themes -->
+    <string name="theme_moharram">تم محرم</string>
+    <string name="theme_ramadan">تم رمضان</string>
+    <string name="theme_eid">تم عید</string>
+    <string name="theme_academic">تم آکادمیک</string>
+</resources>
