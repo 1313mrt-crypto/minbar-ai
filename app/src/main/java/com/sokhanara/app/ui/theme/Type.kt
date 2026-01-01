@@ -1,3 +1,4 @@
+
 package com.sokhanara.app.ui.theme
 
 import androidx.compose.material3.Typography
@@ -8,14 +9,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.sokhanara.app.R
 
-// فونت‌های فارسی
+// فونت فارسی Vazirmatn
 val VazirFontFamily = FontFamily(
     Font(R.font.vazir_regular, FontWeight.Normal),
     Font(R.font.vazir_bold, FontWeight.Bold)
-)
-
-val IranSansFontFamily = FontFamily(
-    Font(R.font.iransans_regular, FontWeight.Normal)
 )
 
 // Typography
@@ -89,23 +86,23 @@ val Typography = Typography(
         letterSpacing = 0.1.sp
     ),
     
-    // Body
+    // Body (استفاده از Vazir به جای IranSans)
     bodyLarge = TextStyle(
-        fontFamily = IranSansFontFamily,
+        fontFamily = VazirFontFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp,
         lineHeight = 24.sp,
         letterSpacing = 0.5.sp
     ),
     bodyMedium = TextStyle(
-        fontFamily = IranSansFontFamily,
+        fontFamily = VazirFontFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 14.sp,
         lineHeight = 20.sp,
         letterSpacing = 0.25.sp
     ),
     bodySmall = TextStyle(
-        fontFamily = IranSansFontFamily,
+        fontFamily = VazirFontFamily,
         fontWeight = FontWeight.Normal,
         fontSize = 12.sp,
         lineHeight = 16.sp,
@@ -134,4 +131,3 @@ val Typography = Typography(
         lineHeight = 16.sp,
         letterSpacing = 0.5.sp
     )
-)
