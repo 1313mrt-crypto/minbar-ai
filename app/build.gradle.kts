@@ -133,10 +133,12 @@ dependencies {
     // Gson
     implementation(Dependencies.gson)
     
+    // Timber (Logging)
+    implementation("com.jakewharton.timber:timber:5.0.1")
+    
     // Debug
     debugImplementation(Dependencies.composeUiTooling)
     debugImplementation(Dependencies.composeUiTestManifest)
-    // Timber (Logging) implementation("com.jakewharton.timber:timber:5.0.1")
     
     // Testing
     testImplementation(Dependencies.junit)
