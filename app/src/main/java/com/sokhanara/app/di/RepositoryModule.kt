@@ -33,4 +33,10 @@ abstract class RepositoryModule {
     abstract fun bindEmotionRepository(
         impl: EmotionRepositoryImpl
     ): EmotionRepository
+    
+    @Binds
+    @Singleton
+    abstract fun bindSourceRepository(
+        impl: SourceRepositoryImpl
+    ): SourceRepository
 }
