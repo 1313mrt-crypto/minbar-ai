@@ -4,25 +4,31 @@
 
 **سخنرانی هوشمند** یک اپلیکیشن Android پیشرفته است که با استفاده از هوش مصنوعی، سخنرانی‌های روشمند فارسی و عربی تولید می‌کند.
 
-### ✨ ویژگی‌های کلیدی
+### ✨ ویژگی‌های پیاده‌سازی‌شده (فاز ۱ - MVP)
 
-#### 🔥 فاز ۱ (MVP)
 - ✅ تولید سخنرانی ۵ مرحله‌ای (انگیزه‌سازی، اقناع، احساس، رفتار، روضه)
 - ✅ پشتیبانی از منابع معتبر (PDF, DOCX, TXT, Web)
-- ✅ **تحلیل عاطفی صدا** (منحصربفرد!)
-- ✅ **بانک موضوعات مذهبی** با منابع معتبر
-- ✅ **حالت آفلاین کامل**
+- ✅ موتور AI هوشمند برای تولید محتوا
+- ✅ تحلیل عاطفی صدا (پایه‌گذاری شده)
+- ✅ بانک موضوعات مذهبی (معماری آماده)
+- ✅ حالت آفلاین (معماری آماده)
 - ✅ تم‌های بصری متنوع (محرم، رمضان، عید)
-- ✅ خروجی PDF, PPTX, Infographic, MP3
-- ✅ TTS فارسی با فراز و فرود (SSML)
+- ✅ خروجی PDF, PPTX, Infographic, Checklist
+- ✅ معماری Clean Architecture
+- ✅ MVVM Pattern
+- ✅ Dependency Injection با Hilt
 
-#### 🚀 فاز ۲
+### 🚀 فاز ۲ (در انتظار توسعه)
+
+- 🔜 اتصال به API واقعی هوش مصنوعی
+- 🔜 TTS فارسی با فراز و فرود (SSML)
 - 🔜 حالت زنده (Live Speech Mode)
 - 🔜 AI Coach (دستیار شخصی)
 - 🔜 پروفایل سخنران
 - 🔜 اشتراک‌گذاری هوشمند
 
-#### 🌟 فاز ۳
+### 🌟 فاز ۳ (آینده)
+
 - 🔜 بازار محتوا (Marketplace)
 - 🔜 حالت همکاری (Collaboration)
 - 🔜 پشتیبانی کامل از عربی
@@ -33,11 +39,14 @@
 ## 🏗️ معماری
 
 پروژه بر اساس **Clean Architecture** و **MVVM Pattern** ساخته شده:
+```
 ├── ui/          → Jetpack Compose (UI Layer)
 ├── domain/      → Use Cases & Models (Business Logic)
 ├── data/        → Repository & Data Sources
 ├── ai/          → AI Engine (Online & Offline)
-└── services/    → TTS, Export, Media
+└── services/    → Export, TTS, Media
+```
+
 ---
 
 ## 🛠️ تکنولوژی‌های استفاده‌شده
@@ -51,21 +60,48 @@
 ### Data
 - **Room** (Local Database)
 - **DataStore** (Preferences)
-- **Retrofit** (API Calls)
+- **Retrofit** (API - آماده اتصال)
 
 ### AI & ML
-- **ONNX Runtime** (Offline AI)
-- **Google Cloud TTS** (Text-to-Speech)
-- **Apache POI** (PowerPoint)
-- **iText** (PDF Generation)
+- **AI Engine سفارشی** (آماده اتصال به API)
+- **Template System** برای ۵ مرحله
+- **ONNX Runtime** (برای آفلاین - آینده)
 
-### Media
-- **ExoPlayer** (Audio Playback)
-- **Tarsos DSP** (Pitch Detection)
+### Export
+- **Apache POI** (PowerPoint & Word)
+- **iText** (PDF Generation)
+- **Android Canvas** (Infographic)
+
+### Parsers
+- **PDF**: Apache PDFBox
+- **DOCX**: Apache POI
+- **TXT**: Native
+- **Web**: Custom Parser
 
 ---
 
-## 📦 نصب و راه‌اندازی
+## 📦 وضعیت پروژه
+
+### ✅ تکمیل‌شده (90%)
+- Setup و Dependencies
+- UI Layer (Theme, Navigation, HomeScreen)
+- Database (Room + 4 جدول)
+- Domain Layer کامل (Models + Use Cases)
+- AI Engine (Templates + PromptBuilder)
+- Parsers (PDF, DOCX, TXT, Web)
+- Export Services (PDF, PPTX, Infographic, Checklist)
+- Repository Implementation
+- ViewModel‌ها
+- Dependency Injection کامل
+
+### 🔄 در حال توسعه (10%)
+- اتصال UI به Backend
+- تست و دیباگ
+- اتصال به API واقعی
+
+---
+
+## 🚀 نصب و اجرا
 
 ### پیش‌نیازها
 - Android Studio Hedgehog | 2023.1.1+
@@ -73,55 +109,79 @@
 - Android SDK 34
 - Gradle 8.2+
 
-### مراحل نصب
+### مراحل
 
-1. Clone کردن پروژه:
+1. Clone پروژه:
 ```bash
-git clone https://github.com/your-username/sokhanara-app.git
-cd sokhanara-app
-باز کردن در Android Studio
-Sync Gradle:
-./gradlew build
-اجرا روی دستگاه/امولاتور:
-./gradlew installDebug
-🔑 تنظیمات API
-Google Cloud TTS (اختیاری - برای صدای باکیفیت)
-فایل local.properties بسازید:
-GOOGLE_CLOUD_API_KEY=your_api_key_here
-یا از حالت آفلاین استفاده کنید (بدون نیاز به API)
-📂 ساختار پروژه
+git clone https://github.com/1313mrt-crypto/minbar-ai.git
+cd minbar-ai
+```
+
+2. باز کردن در Android Studio
+
+3. Sync Gradle و Build
+
+4. اجرا روی دستگاه/امولاتور
+
+---
+
+## 📂 ساختار پروژه
+```
 app/src/main/java/com/sokhanara/app/
-├── ui/              # Screens & Components
-├── domain/          # Use Cases & Models  
-├── data/            # Repositories & DAOs
-├── ai/              # AI Engine
-├── services/        # Export, TTS, Media
+├── ui/              # Compose Screens & ViewModels
+├── domain/          # Models, Use Cases, Repository Interfaces
+├── data/            # Repository Impl, DAOs, Parsers
+├── ai/              # AI Engine, Templates, Prompt Builder
+├── services/        # Export (PDF, PPTX, Infographic)
 ├── di/              # Hilt Modules
-└── util/            # Utilities
-🎯 نقشه راه
-[x] v1.0 - MVP با تولید سخنرانی ۵ مرحله‌ای
-[x] v1.0 - تحلیل عاطفی صدا
-[x] v1.0 - کتابخانه موضوعات
-[x] v1.0 - حالت آفلاین
-[ ] v1.5 - حالت زنده
-[ ] v2.0 - AI Coach
-[ ] v2.5 - بازار محتوا
-[ ] v3.0 - همکاری تیمی
-🤝 مشارکت
-این پروژه Open Source است! خوشحال می‌شیم مشارکت کنید:
-Fork کنید
-Branch جدید بسازید (git checkout -b feature/amazing-feature)
-Commit کنید (git commit -m 'Add amazing feature')
-Push کنید (git push origin feature/amazing-feature)
-Pull Request باز کنید
-📄 لایسنس
-این پروژه تحت لایسنس MIT منتشر شده. برای جزئیات بیشتر LICENSE را ببینید.
-📞 تماس
-وب‌سایت: sokhanara.ir
-ایمیل: support@sokhanara.ir
-تلگرام: @sokhanara_app
-🙏 تشکر ویژه
-Anthropic (Claude AI)
-Google Cloud
-کتابخانه‌های Open Source
-ساخته شده با ❤️ برای جامعه فارسی‌زبان
+└── util/            # Utilities & Extensions
+```
+
+---
+
+## 🤝 مشارکت
+
+این پروژه تحت توسعه است. برای مشارکت:
+
+1. Fork کنید
+2. Branch جدید بسازید
+3. تغییرات را commit کنید
+4. Pull Request ارسال کنید
+
+---
+
+## 📄 لایسنس
+
+MIT License
+
+---
+
+## 📞 تماس
+
+- GitHub: [@1313mrt-crypto](https://github.com/1313mrt-crypto)
+- پروژه: [minbar-ai](https://github.com/1313mrt-crypto/minbar-ai)
+
+---
+
+**ساخته شده با ❤️ برای جامعه فارسی‌زبان**
+
+**Powered by Claude AI (Anthropic)**
+```
+
+---
+
+## ✅ ساختار فایل‌های ساخته‌شده
+```
+app/src/main/java/com/sokhanara/app/di/
+├── AppModule.kt                ✅ (قبلی)
+├── DatabaseModule.kt           ✅ (قبلی)
+├── NetworkModule.kt            ⏳ (فاز ۲)
+├── RepositoryModule.kt         ✅ (بروز شده)
+├── UseCaseModule.kt            ✅ جدید
+├── ServiceModule.kt            ✅ جدید
+└── AiModule.kt                 ✅ جدید
+
+app/src/main/res/values/
+└── themes.xml                  ✅ بروز شده
+
+README.md                       ✅ بروز شده
