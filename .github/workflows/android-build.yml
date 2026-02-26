@@ -46,7 +46,6 @@ jobs:
         name: app-release
         path: app/build/outputs/apk/release/app-release-unsigned.apk
         retention-days: 14
-1. **GitHub Actions خودکار شروع می‌شه** (2-5 دقیقه طول می‌کشه)
 2. **می‌تونی پیشرفت رو ببینی** در:
 ```
    https://github.com/1313mrt-crypto/minbar-ai/actions
