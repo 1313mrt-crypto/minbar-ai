@@ -8,10 +8,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-/**
- * Repository Module
- * تزریق وابستگی Repository‌ها
- */
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
@@ -45,27 +41,10 @@ abstract class RepositoryModule {
     abstract fun bindExportRepository(
         impl: ExportRepositoryImpl
     ): ExportRepository
+    
+    @Binds
+    @Singleton
+    abstract fun bindAudioRepository(
+        impl: AudioRepositoryImpl
+    ): AudioRepository
 }
-```
-
----
-
-## ۲. ساخت پوشه `assets/fonts/` و کپی فونت
-
-### مرحله ۱: ساخت پوشه در GitHub
-
-در GitHub، این مسیر رو بساز:
-```
-app/src/main/assets/fonts/
-```
-
-### مرحله ۲: کپی فایل فونت
-
-فایل `vazir_regular.ttf` که قبلاً در اینجا گذاشتی:
-```
-app/src/main/res/font/vazir_regular.ttf
-```
-
-یک کپی‌ش رو اینجا هم بذار:
-```
-app/src/main/assets/fonts/vazir_regular.ttf
