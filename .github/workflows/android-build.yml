@@ -1,1 +1,53 @@
+name: Android CI
 
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Gradle Wrapper
+      run: |
+        # ایجاد Gradle Wrapper
+        mkdir -p gradle/wrapper
+        
+    - name: Download Gradle Wrapper
+      run: |
+        # دانلود Gradle Wrapper
+        wget https://raw.githubusercontent.com/gradle/gradle/master/gradlew
+        wget https://raw.githubusercontent.com/gradle/gradle/master/gradlew.bat
+        chmod +x gradlew
+        
+        # دانلود فایل‌های wrapper
+        wget -P gradle/wrapper https://raw.githubusercontent.com/gradle/gradle/master/gradle/wrapper/gradle-wrapper.jar
+        
+        # ساخت gradle-wrapper.properties
+        echo "distributionBase=GRADLE_USER_HOME" > gradle/wrapper/gradle-wrapper.properties
+        echo "distributionPath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
+        echo "distributionUrl=https\://services.gradle.org/distributions/gradle-8.2-bin.zip" >> gradle/wrapper/gradle-wrapper.properties
+        echo "zipStoreBase=GRADLE_USER_HOME" >> gradle/wrapper/gradle-wrapper.properties
+        echo "zipStorePath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Build with Gradle
+      run: ./gradlew assembleDebug --stacktrace
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug
+        path: app/build/outputs/apk/debug/app-debug.apk
