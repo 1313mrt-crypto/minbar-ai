@@ -91,3 +91,34 @@ Thumbs.db
 # AI Model files (optional - remove if you want to commit them)
 app/src/main/res/raw/*.onnx
 app/src/main/res/raw/*.tflite
+
+# Gradle
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache
+
+# Android Studio
+.idea/
+*.iml
+*.iws
+*.ipr
+local.properties
+
+# Build
+build/
+.buildconfig
+*.apk
+*.ap_
+*.o
+*.so
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+*.swp
+*.swo
+*~
