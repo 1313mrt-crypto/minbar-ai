@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
 
     steps:
     - name: Checkout code
@@ -21,17 +21,23 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '17'
-        cache: 'gradle'
 
-    - name: Build with Gradle
-      run: |
-        chmod +x ./gradlew || true
-        ./gradlew assembleDebug --stacktrace -x lint
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
+      with:
+        gradle-version: 8.2
+
+    - name: Build Debug APK
+      run: gradle assembleDebug --stacktrace
 
     - name: Upload APK
       if: success()
       uses: actions/upload-artifact@v4
       with:
-        name: app-debug-apk
-        path: app/build/outputs/apk/debug/
+        name: app-debug
+        path: app/build/outputs/apk/debug/app-debug.apk
         retention-days: 7
+
+    - name: Build Status
+      if: always()
+      run: echo "Build Status: ${{ job.status }}"
