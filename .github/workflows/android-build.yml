@@ -28,8 +28,12 @@ jobs:
       with:
         gradle-version: 8.2
 
-    - name: Build Debug APK
-      run: gradle assembleDebug --stacktrace -x lint
+    - name: Build Debug APK (Verbose)
+      run: gradle assembleDebug --stacktrace --info -x lint 2>&1 | tee build.log
+
+    - name: Show Build Log
+      if: always()
+      run: tail -100 build.log || echo "No log found"
 
     - name: Upload APK
       if: success()
@@ -39,6 +43,10 @@ jobs:
         path: app/build/outputs/apk/debug/app-debug.apk
         retention-days: 7
 
-    - name: Build Status
+    - name: Upload Build Log
       if: always()
-      run: echo "Build Status: ${{ job.status }}"
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-log
+        path: build.log
+        retention-days: 3
