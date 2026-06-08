@@ -7,6 +7,9 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,18 +25,13 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
         cache: 'gradle'
+        cache-local-node-modules: false
 
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v3
-      with:
-        gradle-version: 8.2
+    - name: Disable Gradle Daemon
+      run: mkdir -p ~/.gradle && echo "org.gradle.daemon=false" >> ~/.gradle/gradle.properties
 
-    - name: Build Debug APK (Verbose)
-      run: gradle assembleDebug --stacktrace --info -x lint 2>&1 | tee build.log
-
-    - name: Show Build Log
-      if: always()
-      run: tail -100 build.log || echo "No log found"
+    - name: Build Debug APK
+      run: gradle assembleDebug --stacktrace -x lint --no-daemon
 
     - name: Upload APK
       if: success()
@@ -43,10 +41,6 @@ jobs:
         path: app/build/outputs/apk/debug/app-debug.apk
         retention-days: 7
 
-    - name: Upload Build Log
+    - name: Build Status
       if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-log
-        path: build.log
-        retention-days: 3
+      run: echo "Build Status: ${{ job.status }}"
