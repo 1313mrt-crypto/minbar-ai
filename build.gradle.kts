@@ -1,8 +1,8 @@
 plugins {
-    id("com.android.application")
-    kotlin("android")
-    kotlin("kapt")
-    id("com.google.dagger.hilt.android")
+    // سایر پلاگین‌ها مثل اندروید یا kotlinandroid
+    id("com.android.application") version "8.2.0" // اگر استفاده می‌شود
+    kotlin("android") version "1.9.20" // یا kotlin("jvm") بسته به نوع پروژه
+    kotlin("kapt") version "1.9.20"   // ← اینجا نسخه اضافه شده
 }
 
 android {
