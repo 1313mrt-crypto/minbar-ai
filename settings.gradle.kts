@@ -18,9 +18,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven {
-            url = uri("https://jcenter.bintray.com/")
-        }
+        maven("https://maven.tarsos.xyz/repository/tarsos/")
     }
 }
 
