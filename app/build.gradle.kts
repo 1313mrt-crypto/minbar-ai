@@ -128,7 +128,7 @@ dependencies {
     implementation(Dependencies.exoplayerUi)
     
     // Tarsos DSP (Audio Analysis)
-    implementation(Dependencies.tarsosDsp)
+    implementation("com.github.tarsos:TarsosDSP:2.5")
     
     // Gson
     implementation(Dependencies.gson)
