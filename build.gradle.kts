@@ -1,8 +1,7 @@
 plugins {
-    // سایر پلاگین‌ها مثل اندروید یا kotlinandroid
-    id("com.android.application") version "8.2.0" // اگر استفاده می‌شود
-    kotlin("android") version "1.9.20" // یا kotlin("jvm") بسته به نوع پروژه
-    kotlin("kapt") version "1.9.20"   // ← اینجا نسخه اضافه شده
+    id("com.android.application") version "8.2.0"
+    kotlin("android") version "1.9.20"
+    kotlin("kapt") version "1.9.20"
 }
 
 android {
@@ -54,7 +53,7 @@ android {
         kotlinCompilerExtensionVersion = "1.5.10"
     }
 
-    packagingOptions {
+    packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
@@ -112,8 +111,8 @@ dependencies {
     implementation("org.apache.poi:poi-ooxml:5.0.0")
     implementation("org.apache.poi:poi:5.0.0")
 
-    // PDF Parsing (PDFBox)
-    implementation("org.apache.pdfbox:pdfbox-android:2.0.27.0")
+    // PDF Parsing (PDFBox) - کتابخانه صحیح برای اندروید
+    implementation("com.tom-roush:pdfbox-android:2.0.27.0")
 
     // DOCX Parsing (Apache POI)
     implementation("org.apache.poi:poi-scratchpad:5.0.0")
