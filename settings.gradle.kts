@@ -18,7 +18,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven("https://maven.tarsos.xyz/repository/tarsos/")
+        maven("https://jitpack.io")  // ← اضافه کنید
     }
 }
 
