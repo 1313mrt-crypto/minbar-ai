@@ -33,6 +33,15 @@ android {
         resourceConfigurations += listOf("fa", "ar", "en")
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file("${rootProject.projectDir}/app/keystore/minbar-ai-release.jks")
+            storePassword = SigningConfig.storePassword
+            keyAlias = SigningConfig.keyAlias
+            keyPassword = SigningConfig.keyPassword
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -41,6 +50,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
         debug {
             isMinifyEnabled = false
