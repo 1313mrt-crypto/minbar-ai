@@ -5,7 +5,7 @@ object Versions {
     
     // Android
     const val compileSdk = 34
-    const val minSdk = 24
+    const val minSdk = 28  // ✅ تغییر از 24 به 28
     const val targetSdk = 34
     const val versionCode = 1
     const val versionName = "1.0.0"
@@ -33,8 +33,8 @@ object Versions {
     // Data Store
     const val dataStore = "1.0.0"
     
-    // Apache POI (PowerPoint)
-    const val poi = "5.2.5"
+    // Apache POI (PowerPoint) - نسخه کمتر برای سازگاری بیشتر
+    const val poi = "5.0.0"
     
     // iText (PDF)
     const val itext = "5.5.13.3"
