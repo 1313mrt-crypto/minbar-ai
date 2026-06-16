@@ -1,17 +1,17 @@
 package com.sokhanara.app.services.export
 
 import android.content.Context
+import android.graphics.Color
 import com.sokhanara.app.domain.model.Speech
 import com.sokhanara.app.domain.model.VisualTheme
 import com.sokhanara.app.util.FileUtil
 import dagger.hilt.android.qualifiers.ApplicationContext
-import org.apache.poi.sl.usermodel.*
 import org.apache.poi.xslf.usermodel.*
+import org.apache.poi.sl.draw.*
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
-import java.awt.Color
 
 /**
  * PowerPoint Exporter
@@ -36,8 +36,9 @@ class PowerPointExporter @Inject constructor(
             // ایجاد presentation
             val ppt = XMLSlideShow()
             
-            // تنظیم اندازه اسلاید (16:9)
-            ppt.pageSize = java.awt.Dimension(960, 540)
+            // تنظیم اندازه اسلاید (16:9) - using double array for dimensions
+            val pageSize = java.awt.Dimension(960, 540)
+            ppt.pageSize = pageSize
             
             val themeColors = getThemeColors(theme)
             
@@ -80,7 +81,7 @@ class PowerPointExporter @Inject constructor(
         val slide = ppt.createSlide()
         
         // پس‌زمینه
-        slide.background.fillColor = colors.background
+        slide.background.fillColor = java.awt.Color(colors.background)
         
         // عنوان
         val titleBox = slide.createTextBox()
@@ -92,7 +93,7 @@ class PowerPointExporter @Inject constructor(
         
         val titleRun = titleParagraph.textRuns[0]
         titleRun.fontSize = 44.0
-        titleRun.fontColor = colors.primary
+        titleRun.fontColor = java.awt.Color(colors.primary)
         titleRun.isBold = true
         
         // زیرنویس
@@ -105,7 +106,7 @@ class PowerPointExporter @Inject constructor(
         
         val subtitleRun = subtitleParagraph.textRuns[0]
         subtitleRun.fontSize = 18.0
-        subtitleRun.fontColor = colors.secondary
+        subtitleRun.fontColor = java.awt.Color(colors.secondary)
     }
     
     private fun createContentSlide(
@@ -117,7 +118,7 @@ class PowerPointExporter @Inject constructor(
         val slide = ppt.createSlide()
         
         // پس‌زمینه
-        slide.background.fillColor = colors.background
+        slide.background.fillColor = java.awt.Color(colors.background)
         
         // عنوان
         val titleBox = slide.createTextBox()
@@ -129,10 +130,10 @@ class PowerPointExporter @Inject constructor(
         
         val titleRun = titleParagraph.textRuns[0]
         titleRun.fontSize = 32.0
-        titleRun.fontColor = colors.primary
+        titleRun.fontColor = java.awt.Color(colors.primary)
         titleRun.isBold = true
         
-        // محتوا
+        // محتوا - استفاده از RichTextRun برای پشتیبانی بهتر
         val contentBox = slide.createTextBox()
         contentBox.setAnchor(java.awt.Rectangle(50, 120, 860, 380))
         
@@ -146,7 +147,7 @@ class PowerPointExporter @Inject constructor(
             
             paragraph.textRuns.forEach { run ->
                 run.fontSize = 18.0
-                run.fontColor = colors.text
+                run.fontColor = java.awt.Color(colors.text)
             }
         }
     }
@@ -157,7 +158,7 @@ class PowerPointExporter @Inject constructor(
     ) {
         val slide = ppt.createSlide()
         
-        slide.background.fillColor = colors.background
+        slide.background.fillColor = java.awt.Color(colors.background)
         
         val thanksBox = slide.createTextBox()
         thanksBox.setAnchor(java.awt.Rectangle(50, 200, 860, 100))
@@ -168,49 +169,49 @@ class PowerPointExporter @Inject constructor(
         
         val run = paragraph.textRuns[0]
         run.fontSize = 40.0
-        run.fontColor = colors.primary
+        run.fontColor = java.awt.Color(colors.primary)
         run.isBold = true
     }
     
     private fun getThemeColors(theme: VisualTheme): ThemeColors {
         return when (theme) {
             VisualTheme.MOHARRAM -> ThemeColors(
-                primary = Color(28, 28, 28),
-                secondary = Color(198, 40, 40),
-                background = Color(250, 250, 250),
-                text = Color(33, 33, 33)
+                primary = Color.parseColor("#1C1C1C"),
+                secondary = Color.parseColor("#C62828"),
+                background = Color.parseColor("#FAFAFA"),
+                text = Color.parseColor("#212121")
             )
             VisualTheme.RAMADAN -> ThemeColors(
-                primary = Color(0, 105, 92),
-                secondary = Color(255, 213, 79),
-                background = Color(250, 250, 250),
-                text = Color(33, 33, 33)
+                primary = Color.parseColor("#00695C"),
+                secondary = Color.parseColor("#FFD54F"),
+                background = Color.parseColor("#FAFAFA"),
+                text = Color.parseColor("#212121")
             )
             VisualTheme.EID -> ThemeColors(
-                primary = Color(56, 142, 60),
-                secondary = Color(255, 249, 196),
-                background = Color(250, 250, 250),
-                text = Color(33, 33, 33)
+                primary = Color.parseColor("#388E3C"),
+                secondary = Color.parseColor("#FFF9C4"),
+                background = Color.parseColor("#FAFAFA"),
+                text = Color.parseColor("#212121")
             )
             VisualTheme.ACADEMIC -> ThemeColors(
-                primary = Color(26, 84, 144),
-                secondary = Color(212, 175, 55),
-                background = Color(255, 255, 255),
-                text = Color(33, 33, 33)
+                primary = Color.parseColor("#1A5490"),
+                secondary = Color.parseColor("#D4AF37"),
+                background = Color.parseColor("#FFFFFF"),
+                text = Color.parseColor("#212121")
             )
             VisualTheme.MINIMAL -> ThemeColors(
-                primary = Color(33, 33, 33),
-                secondary = Color(117, 117, 117),
-                background = Color(255, 255, 255),
-                text = Color(33, 33, 33)
+                primary = Color.parseColor("#212121"),
+                secondary = Color.parseColor("#757575"),
+                background = Color.parseColor("#FFFFFF"),
+                text = Color.parseColor("#212121")
             )
         }
     }
     
     data class ThemeColors(
-        val primary: Color,
-        val secondary: Color,
-        val background: Color,
-        val text: Color
+        val primary: Int,
+        val secondary: Int,
+        val background: Int,
+        val text: Int
     )
 }

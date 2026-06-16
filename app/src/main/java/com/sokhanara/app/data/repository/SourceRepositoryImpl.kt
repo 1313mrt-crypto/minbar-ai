@@ -6,6 +6,8 @@ import com.sokhanara.app.domain.model.Source
 import com.sokhanara.app.domain.model.SourceMetadata
 import com.sokhanara.app.domain.model.SourceType
 import com.sokhanara.app.domain.repository.SourceRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -19,39 +21,41 @@ class SourceRepositoryImpl @Inject constructor(
 ) : SourceRepository {
     
     override suspend fun parseSource(uri: String, type: SourceType): Result<Source> {
-        return try {
-            val androidUri = Uri.parse(uri)
-            
-            val textResult = when (type) {
-                SourceType.PDF -> pdfParser.extractText(androidUri)
-                SourceType.DOCX -> docxParser.extractText(androidUri)
-                SourceType.TXT -> txtParser.extractText(androidUri)
-                SourceType.WEB_URL -> webParser.extractText(uri)
-            }
-            
-            textResult.fold(
-                onSuccess = { text ->
-                    val source = Source(
-                        id = "source_${System.currentTimeMillis()}",
-                        type = type,
-                        content = text,
-                        title = extractTitle(uri, type),
-                        metadata = SourceMetadata(
-                            fileSize = null,
-                            pageCount = null,
-                            author = null,
-                            createdDate = System.currentTimeMillis()
-                        )
-                    )
-                    Result.success(source)
-                },
-                onFailure = { error ->
-                    Result.failure(error)
+        return withContext(Dispatchers.IO) {
+            try {
+                val androidUri = Uri.parse(uri)
+                
+                val textResult = when (type) {
+                    SourceType.PDF -> pdfParser.extractText(androidUri)
+                    SourceType.DOCX -> docxParser.extractText(androidUri)
+                    SourceType.TXT -> txtParser.extractText(androidUri)
+                    SourceType.WEB_URL -> webParser.extractText(uri)
                 }
-            )
-            
-        } catch (e: Exception) {
-            Result.failure(e)
+                
+                textResult.fold(
+                    onSuccess = { text ->
+                        val source = Source(
+                            id = "source_${System.currentTimeMillis()}",
+                            type = type,
+                            content = text,
+                            title = extractTitle(uri, type),
+                            metadata = SourceMetadata(
+                                fileSize = null,
+                                pageCount = null,
+                                author = null,
+                                createdDate = System.currentTimeMillis()
+                            )
+                        )
+                        Result.success(source)
+                    },
+                    onFailure = { error ->
+                        Result.failure(error)
+                    }
+                )
+                
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
         }
     }
     

@@ -2,8 +2,9 @@ package com.sokhanara.app.data.local.parser
 
 import android.content.Context
 import android.net.Uri
-import com.itextpdf.text.pdf.PdfReader
-import com.itextpdf.text.pdf.parser.PdfTextExtractor
+import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
+import com.tom_roush.pdfbox.pdmodel.PDDocument
+import com.tom_roush.pdfbox.text.PDFTextStripper
 import dagger.hilt.android.qualifiers.ApplicationContext
 import timber.log.Timber
 import java.io.InputStream
@@ -11,11 +12,15 @@ import javax.inject.Inject
 
 /**
  * PDF Parser
- * استخراج متن از PDF
+ * استخراج متن از PDF - استفاده از PDFBox برای Android
  */
 class PdfParser @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
+    
+    init {
+        PDFBoxResourceLoader.init(context)
+    }
     
     fun extractText(uri: Uri): Result<String> {
         return try {
@@ -25,19 +30,13 @@ class PdfParser @Inject constructor(
                 return Result.failure(Exception("نمی‌توان فایل را باز کرد"))
             }
             
-            val reader = PdfReader(inputStream)
-            val stringBuilder = StringBuilder()
-            
-            for (i in 1..reader.numberOfPages) {
-                val text = PdfTextExtractor.getTextFromPage(reader, i)
-                stringBuilder.append(text)
-                stringBuilder.append("\n\n")
-            }
-            
-            reader.close()
+            val document = PDDocument.load(inputStream)
+            val stripper = PDFTextStripper()
+            val text = stripper.getText(document)
+            document.close()
             inputStream.close()
             
-            val extractedText = stringBuilder.toString().trim()
+            val extractedText = text.trim()
             
             if (extractedText.isEmpty()) {
                 return Result.failure(Exception("فایل خالی است یا متنی در آن یافت نشد"))
@@ -54,18 +53,12 @@ class PdfParser @Inject constructor(
     
     fun extractTextFromPath(filePath: String): Result<String> {
         return try {
-            val reader = PdfReader(filePath)
-            val stringBuilder = StringBuilder()
+            val document = PDDocument.load(java.io.File(filePath))
+            val stripper = PDFTextStripper()
+            val text = stripper.getText(document)
+            document.close()
             
-            for (i in 1..reader.numberOfPages) {
-                val text = PdfTextExtractor.getTextFromPage(reader, i)
-                stringBuilder.append(text)
-                stringBuilder.append("\n\n")
-            }
-            
-            reader.close()
-            
-            val extractedText = stringBuilder.toString().trim()
+            val extractedText = text.trim()
             Result.success(extractedText)
             
         } catch (e: Exception) {

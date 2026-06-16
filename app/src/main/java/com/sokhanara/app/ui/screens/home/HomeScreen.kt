@@ -239,17 +239,3 @@ private fun ErrorContent(
         }
     }
 }
-```
-
----
-
-## ✅ ساختار فایل‌های ساخته‌شده
-```
-app/src/main/java/com/sokhanara/app/ui/screens/
-├── home/
-│   ├── HomeScreen.kt (بروزرسانی شد)    ✅
-│   └── HomeViewModel.kt                  ✅
-├── create/
-│   └── CreateViewModel.kt                ✅
-└── preview/
-    └── PreviewViewModel.kt               ✅

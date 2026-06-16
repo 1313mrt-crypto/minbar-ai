@@ -10,7 +10,7 @@ import javax.inject.Inject
 
 /**
  * DOCX Parser
- * استخراج متن از Word
+ * استخراج متن از Word - استفاده از POI برای Android
  */
 class DocxParser @Inject constructor(
     @ApplicationContext private val context: Context
@@ -40,9 +40,9 @@ class DocxParser @Inject constructor(
             document.tables.forEach { table ->
                 table.rows.forEach { row ->
                     row.tableCells.forEach { cell ->
-                        val text = cell.text
-                        if (text.isNotBlank()) {
-                            stringBuilder.append(text)
+                        val cellText = cell.text
+                        if (cellText.isNotBlank()) {
+                            stringBuilder.append(cellText)
                             stringBuilder.append(" ")
                         }
                     }

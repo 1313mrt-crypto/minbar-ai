@@ -1,6 +1,7 @@
 package com.sokhanara.app
 
 import android.app.Application
+import com.sokhanara.app.BuildConfig
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 

@@ -1,5 +1,4 @@
 object Dependencies {
-    
     // Core Android
     const val coreKtx = "androidx.core:core-ktx:${Versions.coreKtx}"
     const val lifecycleRuntimeKtx = "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycleRuntimeKtx}"
@@ -45,6 +44,9 @@ object Dependencies {
     const val poiOoxml = "org.apache.poi:poi-ooxml:${Versions.poi}"
     const val poi = "org.apache.poi:poi:${Versions.poi}"
     
+    // PDFBox (PDF Parsing for Android)
+    const val pdfboxAndroid = "com.tom-roush:pdfbox-android:${Versions.pdfbox}"
+    
     // iText (PDF)
     const val itext = "com.itextpdf:itextpdf:${Versions.itext}"
     
@@ -54,12 +56,9 @@ object Dependencies {
     // Coil (Image Loading)
     const val coil = "io.coil-kt:coil-compose:${Versions.coil}"
     
-    // ExoPlayer (Media)
+    // ExoPlayer (Audio)
     const val exoplayer = "androidx.media3:media3-exoplayer:${Versions.exoplayer}"
     const val exoplayerUi = "androidx.media3:media3-ui:${Versions.exoplayer}"
-    
-    // Tarsos DSP (Audio Analysis)
-    const val tarsosDsp = "be.tarsos.dsp:core:${Versions.tarsosDsp}"
     
     // Gson
     const val gson = "com.google.code.gson:gson:2.10.1"
@@ -67,7 +66,7 @@ object Dependencies {
     // Testing
     const val junit = "junit:junit:${Versions.junit}"
     const val junitExt = "androidx.test.ext:junit:${Versions.junitExt}"
-    const val espressoCore = "androidx.test.espresso:espresso-core:${Versions.espresso}"
+    const val espresso = "androidx.test.espresso:espresso-core:${Versions.espresso}"
     const val composeUiTestJunit4 = "androidx.compose.ui:ui-test-junit4"
     const val mockk = "io.mockk:mockk:${Versions.mockk}"
     const val coroutinesTest = "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.coroutines}"

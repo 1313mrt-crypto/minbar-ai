@@ -131,8 +131,8 @@ dependencies {
     implementation(Dependencies.poiOoxml)
     implementation(Dependencies.poi)
     
-    // iText (PDF)
-    implementation(Dependencies.itext)
+    // PDFBox (PDF Parsing - Android compatible)
+    implementation(Dependencies.pdfboxAndroid)
     
     // ONNX Runtime (Offline AI)
     implementation(Dependencies.onnxRuntime)

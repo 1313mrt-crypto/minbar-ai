@@ -5,7 +5,7 @@ object Versions {
     
     // Android
     const val compileSdk = 34
-    const val minSdk = 28  // ✅ تغییر از 24 به 28
+    const val minSdk = 28
     const val targetSdk = 34
     const val versionCode = 1
     const val versionName = "1.0.0"
@@ -33,10 +33,13 @@ object Versions {
     // Data Store
     const val dataStore = "1.0.0"
     
-    // Apache POI (PowerPoint) - نسخه کمتر برای سازگاری بیشتر
-    const val poi = "5.0.0"
+    // Apache POI (PowerPoint)
+    const val poi = "5.2.3"
     
-    // iText (PDF)
+    // PDFBox (PDF for Android)
+    const val pdfbox = "2.0.27.0"
+    
+    // iText (PDF) - Deprecated for Android, kept for compatibility
     const val itext = "5.5.13.3"
     
     // ONNX Runtime (Offline AI)
@@ -47,9 +50,6 @@ object Versions {
     
     // ExoPlayer (Audio)
     const val exoplayer = "1.2.0"
-    
-    // Tarsos DSP (Pitch Detection)
-    const val tarsosDsp = "2.5"
     
     // Testing
     const val junit = "4.13.2"
