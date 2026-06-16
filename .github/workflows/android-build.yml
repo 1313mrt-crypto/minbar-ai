@@ -2,9 +2,9 @@ name: Android Build
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, master ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
@@ -16,42 +16,35 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Setup Java
+    - name: Setup Java 17
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: '17'
         cache: 'gradle'
 
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      with:
+        api-level: 34
+        build-tools: 34.0.0
+
     - name: Make gradlew executable
       run: chmod +x ./gradlew
 
     - name: Clean and Build Debug APK
-      run: ./gradlew clean assembleDebug --stacktrace --info 2>&1 | tee build.log
+      run: ./gradlew clean assembleDebug --stacktrace
 
-    - name: Show Build Log
-      if: always()
-      run: tail -100 build.log || echo "No log found"
-
-    - name: List APK files
-      if: always()
-      run: find . -name "*.apk" -type f
-
-    - name: Upload APK
-      if: success()
+    - name: Upload Debug APK
       uses: actions/upload-artifact@v4
       with:
-        name: app-debug
-        path: |
-          app/build/outputs/apk/debug/*.apk
-          app/build/outputs/apk/**/*.apk
-        if-no-files-found: warn
+        name: app-debug-apk
+        path: app/build/outputs/apk/debug/*.apk
+        if-no-files-found: error
         retention-days: 7
 
-    - name: Upload Build Log
+    - name: Show Build Info
       if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: build-log
-        path: build.log
-        retention-days: 3
+      run: |
+        echo "Build completed. Checking outputs..."
+        find app/build/outputs -type f -name "*.apk" 2>/dev/null || echo "No APKs found"
