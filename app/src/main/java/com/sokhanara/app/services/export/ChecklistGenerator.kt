@@ -132,7 +132,7 @@ class ChecklistGenerator @Inject constructor(
     private fun getFontPath(): String {
         val fontFile = File(context.cacheDir, "vazir.ttf")
         if (!fontFile.exists()) {
-            context.assets.open("fonts/vazir_regular.ttf").use { input ->
+            context.assets.open("fonts/vazir-regular.ttf").use { input ->
                 fontFile.outputStream().use { output ->
                     input.copyTo(output)
                 }

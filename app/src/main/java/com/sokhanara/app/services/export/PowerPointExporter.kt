@@ -5,12 +5,13 @@ import com.sokhanara.app.domain.model.Speech
 import com.sokhanara.app.domain.model.VisualTheme
 import com.sokhanara.app.util.FileUtil
 import dagger.hilt.android.qualifiers.ApplicationContext
+import org.apache.poi.sl.usermodel.*
 import org.apache.poi.xslf.usermodel.*
 import timber.log.Timber
-import java.awt.Color
 import java.io.File
 import java.io.FileOutputStream
 import javax.inject.Inject
+import java.awt.Color
 
 /**
  * PowerPoint Exporter
