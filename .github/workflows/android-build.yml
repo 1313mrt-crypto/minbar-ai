@@ -10,9 +10,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
@@ -24,11 +21,13 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
+      # تغییر بزرگ: استفاده از روش جایگزین برای نصب SDK
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          packages: platforms;android-34 build-tools;34.0.0
-          cmdline-tools-version: 11.0
+        run: |
+          mkdir -p $ANDROID_HOME/licenses
+          echo "8933bad161af4178b1185d1a37fbf41ea5261c55" > $ANDROID_HOME/licenses/android-sdk-license
+          echo "d56f5187473751e9f1a87d3a6839352e008a0d2f" > $ANDROID_HOME/licenses/android-sdk-preview-license
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "platforms;android-34" "build-tools;34.0.0"
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
@@ -43,10 +42,3 @@ jobs:
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
           retention-days: 7
-
-      - name: Show Build Info
-        if: always()
-        run: |
-          echo "Build completed."
-          find app/build/outputs -type f -name "*.apk"
-          
