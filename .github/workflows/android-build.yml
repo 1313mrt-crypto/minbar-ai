@@ -19,10 +19,7 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
-      # در اینجا از gradlew خودِ پروژه استفاده می‌کنیم، اما متغیر محیطی جاوا را به زور به آن تزریق می‌کنیم
+      # در این روش، ما مستقیماً دستور gradle را صدا می‌زنیم
+      # و به جای فایل ./gradlew، از خودِ ابزارِ گریدل نصب شده روی سرور استفاده می‌کنیم
       - name: Build with Gradle
-        env:
-          JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
-        run: |
-          chmod +x ./gradlew
-          ./gradlew clean assembleDebug --stacktrace
+        run: gradle clean assembleDebug --stacktrace
