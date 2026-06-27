@@ -36,9 +36,12 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Clean and Build Debug APK
+        # در اینجا ما مستقیماً مسیرِ جاوای نصب شده توسط اکشنِ بالا را به گریدل تزریق می‌کنیم
         env:
           JAVA_HOME: ${{ steps.setup-java.outputs.path }}
-        run: ./gradlew clean assembleDebug --stacktrace
+        run: |
+          export JAVA_HOME=${{ steps.setup-java.outputs.path }}
+          ./gradlew clean assembleDebug --stacktrace
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
@@ -51,5 +54,5 @@ jobs:
       - name: Show Build Info
         if: always()
         run: |
-          echo "Build completed."
-          find app/build/outputs -type f -name "*.apk"
+          echo "Build process finished."
+          ls -R app/build/outputs/apk/debug/ || echo "No APK found"
