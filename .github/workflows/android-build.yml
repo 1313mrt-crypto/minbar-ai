@@ -10,18 +10,21 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.2.2
 
       - name: Setup Java 17
+        id: setup-java
         uses: actions/setup-java@v4.7.0
         with:
           distribution: 'temurin'
           java-version: '17'
           cache: 'gradle'
 
-      # تغییر بزرگ: استفاده از روش جایگزین برای نصب SDK
       - name: Setup Android SDK
         run: |
           mkdir -p $ANDROID_HOME/licenses
@@ -33,6 +36,8 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Clean and Build Debug APK
+        env:
+          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
         run: ./gradlew clean assembleDebug --stacktrace
 
       - name: Upload Debug APK
@@ -42,3 +47,9 @@ jobs:
           path: app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
           retention-days: 7
+
+      - name: Show Build Info
+        if: always()
+        run: |
+          echo "Build completed."
+          find app/build/outputs -type f -name "*.apk"
