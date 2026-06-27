@@ -13,41 +13,40 @@ jobs:
     timeout-minutes: 40
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4.2.2 # تغییر از v4
-      
-    - name: Setup Java 17
-      uses: actions/setup-java@v4.7.0 # تغییر از v4
-      with:
-        distribution: 'temurin'
-        java-version: '17'
-        cache: 'gradle'
+      - name: Checkout code
+        uses: actions/checkout@v4.2.2
 
-    - name: Setup Android SDK
-      # این اکشن در حال حاضر نسخه جدیدتری ندارد، اما با اضافه کردن
-      # متغیر محیطی (env) در ابتدای فایل، مشکل حل می‌شود.
-      uses: android-actions/setup-android@v3
-      with:
-        packages: android-34,build-tools;34.0.0
+      - name: Setup Java 17
+        uses: actions/setup-java@v4.7.0
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
 
-    - name: Make gradlew executable
-      run: chmod +x ./gradlew
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: |
+            platforms;android-34
+            build-tools;34.0.0
 
-    - name: Clean and Build Debug APK
-      run: ./gradlew clean assembleDebug --stacktrace
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
 
-    - name: Upload Debug APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: app-debug-apk
-        path: app/build/outputs/apk/debug/*.apk
-        if-no-files-found: error
-        retention-days: 7
+      - name: Clean and Build Debug APK
+        run: ./gradlew clean assembleDebug --stacktrace
 
-    - name: Show Build Info
-      if: always()
-      run: |
-        echo "Build completed. Checking outputs..."
-        find app/build/outputs -type f -name "*.apk" 2>/dev/null || echo "No APKs found"
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Show Build Info
+        if: always()
+        run: |
+          echo "Build completed. Checking outputs..."
+          find app/build/outputs -type f -name "*.apk" 2>/dev/null || echo "No APKs found"
