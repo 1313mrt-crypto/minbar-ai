@@ -17,7 +17,12 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: gradle
 
-      # استفاده از خودِ gradle نصب شده در سرور به جای فایلِ gradlewِ پروژه
+      # در اینجا از gradlew خودِ پروژه استفاده می‌کنیم، اما متغیر محیطی جاوا را به زور به آن تزریق می‌کنیم
       - name: Build with Gradle
-        run: gradle clean assembleDebug
+        env:
+          JAVA_HOME: ${{ env.JAVA_HOME_17_X64 }}
+        run: |
+          chmod +x ./gradlew
+          ./gradlew clean assembleDebug --stacktrace
