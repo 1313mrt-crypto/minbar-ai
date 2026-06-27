@@ -27,9 +27,8 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         with:
-          packages: |
-            platforms;android-34
-            build-tools;34.0.0
+          packages: platforms;android-34 build-tools;34.0.0
+          cmdline-tools-version: 11.0
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
@@ -48,5 +47,6 @@ jobs:
       - name: Show Build Info
         if: always()
         run: |
-          echo "Build completed. Checking outputs..."
-          find app/build/outputs -type f -name "*.apk" 2>/dev/null || echo "No APKs found"
+          echo "Build completed."
+          find app/build/outputs -type f -name "*.apk"
+          
