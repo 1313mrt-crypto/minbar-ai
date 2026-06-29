@@ -1,8 +1,8 @@
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
+    id("org.jetbrains.kotlin.plugin.compose")   // ➕ جدید
 }
 
 android {
@@ -11,8 +11,8 @@ android {
     sourceSets {
         getByName("main") {
             manifest.srcFile("src/main/AndroidManifest.xml")
-            java.srcDirs("src/main/java")
-            res.srcDirs("src/main/res")
+            java.directories += "src/main/java"
+            res.directories += "src/main/res"
         }
     }
 
@@ -24,13 +24,15 @@ android {
         versionName = Versions.versionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        
+
         vectorDrawables {
             useSupportLibrary = true
         }
-        
-        // برای فونت‌های فارسی
-        resourceConfigurations += listOf("fa", "ar", "en")
+    }
+
+    // برای فونت‌های فارسی (جایگزین resourceConfigurations منسوخ‌شده)
+    androidResources {
+        localeFilters += listOf("fa", "ar", "en")
     }
 
     signingConfigs {
@@ -57,25 +59,18 @@ android {
             applicationIdSuffix = ".debug"
         }
     }
-    
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-    
+
     buildFeatures {
         compose = true
         buildConfig = true
     }
-    
-    composeOptions {
-        kotlinCompilerExtensionVersion = Versions.composeCompiler
-    }
-    
+
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -89,16 +84,22 @@ android {
     }
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
+}
+
 dependencies {
     // Core
     implementation(Dependencies.coreKtx)
     implementation(Dependencies.lifecycleRuntimeKtx)
     implementation(Dependencies.lifecycleViewModelCompose)
-    
+
     // Coroutines
     implementation(Dependencies.coroutinesCore)
     implementation(Dependencies.coroutinesAndroid)
-    
+
     // Compose
     implementation(platform(Dependencies.composeBom))
     implementation(Dependencies.composeUi)
@@ -107,63 +108,63 @@ dependencies {
     implementation(Dependencies.composeMaterial3)
     implementation(Dependencies.activityCompose)
     implementation(Dependencies.navigationCompose)
-    
+
     // Hilt
     implementation(Dependencies.hiltAndroid)
     ksp(Dependencies.hiltCompiler)
     implementation(Dependencies.hiltNavigationCompose)
-    
+
     // Room
     implementation(Dependencies.roomRuntime)
     implementation(Dependencies.roomKtx)
     ksp(Dependencies.roomCompiler)
-    
+
     // DataStore
     implementation(Dependencies.dataStore)
-    
+
     // Network
     implementation(Dependencies.retrofit)
     implementation(Dependencies.retrofitConverterGson)
     implementation(Dependencies.okhttp)
     implementation(Dependencies.okhttpLoggingInterceptor)
-    
+
     // Apache POI (PowerPoint & Word)
     implementation(Dependencies.poiOoxml)
     implementation(Dependencies.poi)
-    
+
     // PDFBox (PDF Parsing - Android compatible)
     implementation(Dependencies.pdfboxAndroid)
-    
+
     // ONNX Runtime (Offline AI)
     implementation(Dependencies.onnxRuntime)
-    
+
     // Coil (Image Loading)
     implementation(Dependencies.coil)
-    
+
     // ExoPlayer (Media)
     implementation(Dependencies.exoplayer)
     implementation(Dependencies.exoplayerUi)
-    
+
     // Tarsos DSP (Audio Analysis)
     //implementation("com.github.tarsos:TarsosDSP:2.5")
-    
+
     // Gson
     implementation(Dependencies.gson)
-    
+
     // Timber (Logging)
     implementation("com.jakewharton.timber:timber:5.0.1")
-    
+
     // Debug
     debugImplementation(Dependencies.composeUiTooling)
     debugImplementation(Dependencies.composeUiTestManifest)
-    
+
     // Testing
     testImplementation(Dependencies.junit)
     testImplementation(Dependencies.mockk)
     testImplementation(Dependencies.coroutinesTest)
     testImplementation(Dependencies.turbine)
     testImplementation(Dependencies.roomTesting)
-    
+
     androidTestImplementation(Dependencies.junitExt)
     androidTestImplementation(Dependencies.espresso)
     androidTestImplementation(platform(Dependencies.composeBom))
