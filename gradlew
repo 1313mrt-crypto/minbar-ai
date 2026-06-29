@@ -41,9 +41,10 @@ cd "$SAVED" >/dev/null
 
 APP_NAME="Gradle"
 APP_BASE_NAME=`basename "$0"`
+unset JAVACMD
 
 # Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
-DEFAULT_JVM_OPTS='" -Dfile.encoding=UTF-8 "'
+DEFAULT_JVM_OPTS="-Dfile.encoding=UTF-8"
 
 # Use the maximum available, or set MAX_FD != -1 to use that value.
 MAX_FD="maximum"
@@ -79,7 +80,7 @@ case "`uname`" in
 esac
 
 # Determine the Java command to use to start the JVM.
-if [ -n "$JAVA_HOME" ] ; then
+if [ -n "$JAVA_HOME" ] && [ -x "$JAVA_HOME/bin/java" ] ; then
     if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
         # IBM's JDK on AIX uses strange locations for the executables
         JAVACMD="$JAVA_HOME/jre/sh/java"
@@ -87,12 +88,13 @@ if [ -n "$JAVA_HOME" ] ; then
         JAVACMD="$JAVA_HOME/bin/java"
     fi
     if [ ! -x "$JAVACMD" ] ; then
-        die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
-
-Please set the JAVA_HOME variable in your environment to match the
-location of your Java installation."
+        warn "WARNING: JAVA_HOME is set to an invalid directory: $JAVA_HOME"
+        unset JAVA_HOME
+        JAVACMD="java"
     fi
-else
+fi
+
+if [ -z "$JAVACMD" ] ; then
     JAVACMD="java"
     which java >/dev/null 2>&1 || die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
 
@@ -145,4 +147,9 @@ APP_ARGS=$(save "$@")
 # Collect all arguments for the java command, following the shell quoting and substitution rules
 eval set -- $DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS \"-Dorg.gradle.appname=$APP_BASE_NAME\" -classpath \"$CLASSPATH\" org.gradle.wrapper.GradleWrapperMain \"$@\"
 
-exec \"$JAVACMD\" \"$@\"
+if [ -n "$JAVACMD" ] && [ "${JAVACMD#/}" != "$JAVACMD" ] && [ ! -x "$JAVACMD" ] ; then
+    warn "WARNING: JAVA command is invalid: $JAVACMD"
+    JAVACMD="java"
+fi
+
+exec "$JAVACMD" "$@"
