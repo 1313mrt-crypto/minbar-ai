@@ -1,4 +1,4 @@
-    plugins {
+plugins {
     id("com.android.application")
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
@@ -10,8 +10,8 @@ android {
     sourceSets {
         getByName("main") {
             manifest.srcFile("src/main/AndroidManifest.xml")
-            java.srcDirs("src/main/java")
-            res.srcDirs("src/main/res")
+            java.directories += "src/main/java"
+            res.directories += "src/main/res"
         }
     }
 
@@ -27,9 +27,11 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+    }
 
-        // برای فونت‌های فارسی
-        resourceConfigurations += listOf("fa", "ar", "en")
+    // برای فونت‌های فارسی (جایگزین resourceConfigurations منسوخ‌شده)
+    androidResources {
+        localeFilters += listOf("fa", "ar", "en")
     }
 
     signingConfigs {
@@ -166,7 +168,7 @@ dependencies {
     testImplementation(Dependencies.roomTesting)
 
     androidTestImplementation(Dependencies.junitExt)
-    androidTestImplementation(Dependencies.espressoCore)
+    androidTestImplementation(Dependencies.espresso)
     androidTestImplementation(platform(Dependencies.composeBom))
     androidTestImplementation(Dependencies.composeUiTestJunit4)
 }
