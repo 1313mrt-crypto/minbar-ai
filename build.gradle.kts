@@ -3,5 +3,5 @@ plugins {
     id("com.android.library") version "9.2.0" apply false
     id("org.jetbrains.kotlin.android") version "2.3.10" apply false
    id("com.google.dagger.hilt.android") version "2.51.1" apply false
-    id("com.google.devtools.ksp") version "2.3.10-1.0.15" apply false
+    id("com.google.devtools.ksp") version "2.3.9" apply false
 }
