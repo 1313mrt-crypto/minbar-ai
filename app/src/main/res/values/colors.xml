@@ -38,6 +38,9 @@
     <color name="eid_primary">#388E3C</color>
     <color name="eid_accent">#FFF9C4</color>
     
+    <!-- Launcher -->
+    <color name="ic_launcher_background">#1A5490</color>
+    
     <!-- Neutral -->
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
