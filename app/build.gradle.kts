@@ -165,7 +165,7 @@ dependencies {
     testImplementation(Dependencies.roomTesting)
     
     androidTestImplementation(Dependencies.junitExt)
-    androidTestImplementation(Dependencies.espressoCore)
+    androidTestImplementation(Dependencies.espresso)
     androidTestImplementation(platform(Dependencies.composeBom))
     androidTestImplementation(Dependencies.composeUiTestJunit4)
 }
