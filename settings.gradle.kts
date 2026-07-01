@@ -6,7 +6,7 @@ pluginManagement {
     }
     
     plugins {
-        id("com.android.application") version "8.2.0"
+        id("com.android.application") version "8.4.0"
         id("org.jetbrains.kotlin.android") version "1.9.24"
         id("com.google.dagger.hilt.android") version "2.48"
         id("com.google.devtools.ksp") version "1.9.24-1.0.20"
