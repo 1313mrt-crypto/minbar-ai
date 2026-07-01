@@ -1,6 +1,6 @@
 object Versions {
     // Core
-    const val kotlin = "1.9.24"
+    const val kotlin = "1.9.20"
     const val coroutines = "1.7.3"
     
     // Android
