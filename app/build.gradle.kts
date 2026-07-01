@@ -1,5 +1,6 @@
 plugins {
     id("com.android.application")
+    id("org.jetbrains.kotlin.android")
     id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp")
     id("org.jetbrains.kotlin.plugin.compose")   // ➕ جدید
@@ -11,8 +12,8 @@ android {
     sourceSets {
         getByName("main") {
             manifest.srcFile("src/main/AndroidManifest.xml")
-            java.directories += "src/main/java"
-            res.directories += "src/main/res"
+            java.srcDirs("src/main/java")
+            res.srcDirs("src/main/res")
         }
     }
 
@@ -74,7 +75,7 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
-            // برای رفع تداخل Apache POI
+            // برای رفع ت��اخل Apache POI
             excludes += "META-INF/DEPENDENCIES"
             excludes += "META-INF/LICENSE"
             excludes += "META-INF/LICENSE.txt"
